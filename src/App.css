@@ -13,12 +13,8 @@
   padding-bottom: 100px;
 }
 
-.App-add-todo-input {
-  max-width: 300px;
-  margin-right: 5px;
-}
-
-.App-add-todo-button {
+.App-create-room-button,
+.App-join-room-button {
 }
 
 .App-todos {
