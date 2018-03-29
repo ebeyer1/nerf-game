@@ -1,0 +1,25 @@
+@import "~antd/dist/antd.css";
+
+.Home {
+  text-align: center;
+}
+
+.Home-header h1 {
+  color: whitesmoke;
+}
+
+.Home-content {
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
+.Home-create-room-button,
+.Home-join-room-button,
+.Home-delete-room-button,
+.Home-sign-in-button {
+}
+
+.Home-sign-in-button {
+  float: right;
+  margin-top: 11px;
+}
