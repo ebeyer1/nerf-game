@@ -14,7 +14,14 @@
 }
 
 .App-create-room-button,
-.App-join-room-button {
+.App-join-room-button,
+.App-delete-room-button,
+.App-sign-in-button {
+}
+
+.App-sign-in-button {
+  float: right;
+  margin-top: 11px;
 }
 
 .App-todos {
