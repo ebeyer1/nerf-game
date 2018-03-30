@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Layout, Input, Button, List, Icon } from "antd";
 import * as firebase from "firebase";
-import firebaseApp from "@firebase/app";
+import { Link } from 'react-router-dom';
 
 // We import our firestore module
 import firestore from "./firestore";
@@ -21,7 +21,6 @@ class Home extends Component {
       user: {}
      };
     // We want event handlers to share this context
-    this.createRoom = this.createRoom.bind(this);
     this.deleteRoom = this.deleteRoom.bind(this);
     this.joinRoom = this.joinRoom.bind(this);
     this.toggleSignIn = this.toggleSignIn.bind(this);
@@ -73,18 +72,6 @@ class Home extends Component {
     });
     // [END authstatelistener]
   }
-  
-  getHash() {
-    const length = 4;
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return text;
-  }
 
   async joinRoom(id) {
     if (!this.state.loggedIn) return;
@@ -110,27 +97,6 @@ class Home extends Component {
       });
     
       this.setState({ joiningRoom: false });
-  }
-  
-  async createRoom() {
-    if (!this.state.loggedIn) return;
-    console.log('creating room', this.state.creatingRoom);
-    if (this.state.creatingRoom) return;
-    // Set a flag to indicate loading
-    this.setState({ creatingRoom: true });
-    // Add a new todo from the value of the input
-    var that = this;
-    console.log('make req');
-    await firestore.collection("rooms").doc(this.getHash()).set({
-      timestamp: firebaseApp.firestore.FieldValue.serverTimestamp(),
-      private: false,
-      playersInLobby: 1,
-      creator: this.state.user.uid,
-      players: [this.state.user.uid]
-    });
-    console.log('req finished');
-    // Remove the loading flag and clear the input
-    this.setState({ creatingRoom: false });
   }
   
   async deleteRoom(id) {
@@ -195,8 +161,7 @@ class Home extends Component {
             className="Home-create-room-button"
             size="large"
             type="primary"
-            onClick={this.createRoom}
-            loading={this.state.creatingRoom}
+            href="/create"
           >
             Create Room
           </Button>
