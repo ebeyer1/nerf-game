@@ -24,7 +24,7 @@ class Home extends Component {
     this.deleteRoom = this.deleteRoom.bind(this);
     this.joinRoom = this.joinRoom.bind(this);
     this.toggleSignIn = this.toggleSignIn.bind(this);
-    // We listen for live changes to our todos collection in Firebase
+    // We listen for live changes to our rooms collection in Firebase
     firestore.collection("rooms").onSnapshot(snapshot => {
       let rooms = [];
       snapshot.forEach(doc => {
@@ -77,6 +77,8 @@ class Home extends Component {
     if (!this.state.loggedIn) return;
     console.log('join room', id);
     if (this.state.joiningRoom) return;
+    
+    // TODO - if already in room, don't join...
     
     this.setState({ joiningRoom: true });
     let roomRef = await firestore

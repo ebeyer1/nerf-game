@@ -22,13 +22,23 @@ class Create extends Component {
       roomCreated: false,
       maxPlayers: 1,
       players: [],
-      roomHash: '',
+      roomHash: this.getHash(),
       loggedIn: false,
       user: {}
      };
     // We want event handlers to share this context
     this.createRoom = this.createRoom.bind(this);
 
+    // TODO - next steps:
+    
+    firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
+      console.log('heres my snapshot', snapshot);
+      if (snapshot.exists) {
+        var room = snapshot.data();
+        this.setState({ players: room.players });
+      }
+    });
+    
     // Listening for auth state changes.
     // [START authstatelistener]
     firebase.auth().onAuthStateChanged(user => {
@@ -82,11 +92,10 @@ class Create extends Component {
     // Add a new todo from the value of the input
     let that = this;
     console.log('make req');
-    var newRoomHash = this.getHash();
     var players = [this.state.user.uid];
-    this.setState({ roomHash: newRoomHash, players: players });
-    console.log('about the create with hash...', newRoomHash);
-    await firestore.collection("rooms").doc(newRoomHash).set({
+    this.setState({ players: players });
+    console.log('about the create with hash...', this.state.roomHash);
+    await firestore.collection("rooms").doc(this.state.roomHash).set({
       timestamp: firebaseApp.firestore.FieldValue.serverTimestamp(),
       private: false,
       maxPlayers: this.state.maxPlayers,  
@@ -103,7 +112,7 @@ class Create extends Component {
   }
 
   render() {
-    const roomInfo = this.state.roomHash ?
+    const roomInfo = this.state.roomCreated ?
       (
         <div>
           <hr />
