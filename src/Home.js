@@ -92,12 +92,14 @@ class Home extends Component {
     console.log('data ', data);
     let playerCount = data.playersInLobby || 1;
     let playerList = data.players || [];
-    playerList.push(this.state.user.uid);
-    await roomRef
-      .update({
-        playersInLobby: playerCount+1,
-        players: playerList
-      });
+    if (playerList.indexOf(this.state.user.uid) === -1) {
+      playerList.push(this.state.user.uid);
+      await roomRef
+        .update({
+          playersInLobby: playerCount+1,
+          players: playerList
+        });
+    }
     
     this.setState({ joiningRoom: false, toLobbyHash: id });
   }
