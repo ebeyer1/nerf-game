@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Layout, Input, InputNumber, Button, List, Icon } from "antd";
 import firebaseApp from "@firebase/app";
 import * as firebase from "firebase";
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 // We import our firestore module
 import firestore from "./firestore";
@@ -24,12 +24,15 @@ class Create extends Component {
       players: [],
       roomHash: this.getHash(),
       loggedIn: false,
-      user: {}
+      user: {},
+      toLobbyHash: ''
      };
     // We want event handlers to share this context
     this.createRoom = this.createRoom.bind(this);
 
     // TODO - next steps:
+    // TODO - in the lobby view, the creator can manage... start game, add players, destroy lobby
+    //        destroying lobby takes user back to home page    
     
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
@@ -104,7 +107,7 @@ class Create extends Component {
     });
     console.log('req finished');
     // Remove the loading flag and clear the input
-    this.setState({ creatingRoom: false, roomCreated: true });
+    this.setState({ creatingRoom: false, roomCreated: true, toLobbyHash: this.state.roomHash });
     
     
     // TODO - navigate to new lobby page
@@ -112,28 +115,11 @@ class Create extends Component {
   }
 
   render() {
-    const roomInfo = this.state.roomCreated ?
-      (
-        <div>
-          <hr />
-          <h2>Room Code: {this.state.roomHash}</h2>
-          <h4>Players</h4>
-          <List
-            className="Home-players"
-            size="large"
-            bordered
-            dataSource={this.state.players}
-            renderItem={player => (
-              <List.Item>
-                Id: {player}
-              </List.Item>
-            )}
-          />
-        </div>
-      ) : (
-        <div></div>
-      );
-      
+    if (this.state.toLobbyHash) {
+      let lobbyUrl = '/lobby/' + this.state.toLobbyHash;
+      return <Redirect to={lobbyUrl} />
+    }
+    
     return (
       <Layout className="Home">
         <Content className="Home-content">
@@ -163,7 +149,6 @@ class Create extends Component {
           >
             Create Room
           </Button>
-          {roomInfo}
         </Content>
       </Layout>
     );

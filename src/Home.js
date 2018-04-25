@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Layout, Input, Button, List, Icon } from "antd";
 import * as firebase from "firebase";
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 // We import our firestore module
 import firestore from "./firestore";
@@ -18,7 +18,8 @@ class Home extends Component {
       creatingRoom: false, joiningRoom: false, deletingRoom: false,
       rooms: [],
       loggedIn: false,
-      user: {}
+      user: {},
+      toLobbyHash: ''
      };
     // We want event handlers to share this context
     this.deleteRoom = this.deleteRoom.bind(this);
@@ -98,7 +99,7 @@ class Home extends Component {
         players: playerList
       });
     
-      this.setState({ joiningRoom: false });
+    this.setState({ joiningRoom: false, toLobbyHash: id });
   }
   
   async deleteRoom(id) {
@@ -135,6 +136,12 @@ class Home extends Component {
   }
 
   render() {
+    if (this.state.toLobbyHash) {
+      let lobbyUrl = '/lobby/' + this.state.toLobbyHash;
+      return <Redirect to={lobbyUrl} />
+    }
+    
+    // TODO - look below
     // see here for an actual login implementation: https://reactjs.org/docs/conditional-rendering.html
     // and https://github.com/firebase/quickstart-js/blob/master/auth/README.md
     const isLoggedIn = this.state.loggedIn;
