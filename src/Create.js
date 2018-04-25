@@ -3,6 +3,7 @@ import { Layout, Input, InputNumber, Button, List, Icon } from "antd";
 import firebaseApp from "@firebase/app";
 import * as firebase from "firebase";
 import { Link, Redirect } from 'react-router-dom';
+import RoleList from './RoleList';
 
 // We import our firestore module
 import firestore from "./firestore";
@@ -25,10 +26,12 @@ class Create extends Component {
       roomHash: this.getHash(),
       loggedIn: false,
       user: {},
-      toLobbyHash: ''
+      toLobbyHash: '',
+      roles: []
      };
     // We want event handlers to share this context
     this.createRoom = this.createRoom.bind(this);
+    this.handleRoleSelected = this.handleRoleSelected.bind(this);
 
     // TODO - next steps:
     // TODO - in the lobby view, the creator can manage... start game, add players, destroy lobby
@@ -103,7 +106,8 @@ class Create extends Component {
       private: false,
       maxPlayers: this.state.maxPlayers,  
       creator: this.state.user.uid,
-      players: players
+      players: players,
+      roles: this.state.roles
     });
     console.log('req finished');
     // Remove the loading flag and clear the input
@@ -112,6 +116,21 @@ class Create extends Component {
     
     // TODO - navigate to new lobby page
     // this.context.router.transitionTo('/lobby/' + this.state.roomHash);
+  }
+  
+  handleRoleSelected(role) {
+    console.log('inside handleRoleSelected', role);
+    var roleList = this.state.roles || [];
+    var index = roleList.indexOf(role);
+    console.log('role lsit and index', roleList, index);
+    if (index === -1) {
+      console.log('adding');
+      roleList.push(role);
+    } else {
+      console.log('removing');
+      roleList.splice(index, 1);
+    }
+    this.setState({ roles: roleList });
   }
 
   render() {
@@ -149,6 +168,9 @@ class Create extends Component {
           >
             Create Room
           </Button>
+          <hr />
+          <div>Select a number of roles from the list below equal to the number of players + 3</div>
+          <RoleList onSelectRole={this.handleRoleSelected} selectedRoles={this.state.roles}></RoleList>
         </Content>
       </Layout>
     );

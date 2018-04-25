@@ -19,7 +19,8 @@ class Lobby extends Component {
     console.log('lobby props', props, props.match.params.hash);
     this.state = { 
       roomHash: props.match.params.hash,
-      players: []
+      players: [],
+      roles: []
     };
     // We want event handlers to share this context
     // this.createRoom = this.createRoom.bind(this);
@@ -28,7 +29,7 @@ class Lobby extends Component {
       console.log('heres my snapshot', snapshot);
       if (snapshot.exists) {
         var room = snapshot.data();
-        this.setState({ players: room.players });
+        this.setState({ players: room.players, roles: room.roles });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -70,6 +71,8 @@ class Lobby extends Component {
   // TODO - add an /account page that lets the user set a name for their anonymous account?
   //        then display the name instead of id in views.
   render() {
+    let roles = this.state.roles.join(", ");
+    
     return (
       <Layout className="Home">
         <Content className="Home-content">
@@ -91,6 +94,9 @@ class Lobby extends Component {
                 </List.Item>
               )}
             />
+            <hr />
+            <h4>Role Pool</h4>
+            {roles}
           </div>
         </Content>
       </Layout>

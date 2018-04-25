@@ -1,0 +1,40 @@
+.role-list-container {
+  padding: 8px;
+}
+
+.role {
+  padding-bottom: 8px;
+  cursor: pointer;
+}
+
+.role > div {
+  border: 2px solid black;
+  border-radius: 1px;
+}
+
+.role.city > div {
+  border-color: #00A0E9;
+}
+
+.role.city > div:hover,
+.role.city.selected > div {
+  background-color: #00A0E9;
+}
+
+.role.mob > div {
+  border-color: salmon;
+}
+
+.role.mob > div:hover,
+.role.mob.selected > div {
+  background-color: salmon;
+}
+
+.role.neutral > div {
+  border-color: gray;
+}
+
+.role.neutral > div:hover,
+.role.neutral.selected > div {
+  background-color: gray;
+}
