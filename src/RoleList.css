@@ -10,6 +10,7 @@
 .role > div {
   border: 2px solid black;
   border-radius: 1px;
+  padding: 5px 0;
 }
 
 .role.city > div {
@@ -31,10 +32,10 @@
 }
 
 .role.neutral > div {
-  border-color: gray;
+  border-color: #ababab;
 }
 
 .role.neutral > div:hover,
 .role.neutral.selected > div {
-  background-color: gray;
+  background-color: #ababab;
 }

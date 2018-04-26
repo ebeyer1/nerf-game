@@ -21,7 +21,7 @@ class Create extends Component {
     this.state = { 
       creatingRoom: false,
       roomCreated: false,
-      maxPlayers: 1,
+      maxPlayers: 2,
       players: [],
       roomHash: this.getHash(),
       loggedIn: false,
@@ -91,6 +91,7 @@ class Create extends Component {
   async createRoom() {
     if (!this.state.loggedIn) return;
     if (this.state.maxPlayers < 2) return;
+    if (this.state.roles.length !== this.state.maxPlayers + 3) return;
     console.log('creating room', this.state.creatingRoom);
     if (this.state.creatingRoom) return;
     // Set a flag to indicate loading
@@ -121,11 +122,13 @@ class Create extends Component {
   handleRoleSelected(role) {
     console.log('inside handleRoleSelected', role);
     var roleList = this.state.roles || [];
-    var index = roleList.indexOf(role);
+    var index = roleList.indexOf(role.id);
     console.log('role lsit and index', roleList, index);
     if (index === -1) {
       console.log('adding');
-      roleList.push(role);
+      if (roleList.length < this.state.maxPlayers + 3) {
+        roleList.push(role.id);
+      }
     } else {
       console.log('removing');
       roleList.splice(index, 1);
@@ -145,6 +148,7 @@ class Create extends Component {
           <div>
             <Link to="/">Back to Home</Link>
           </div>
+          <label for="player-count"><strong>Player Count</strong>&nbsp;</label>
           <InputNumber
             ref="add-todo-input"
             className="App-add-todo-input"
@@ -153,6 +157,8 @@ class Create extends Component {
             max="50"
             size="large"
             step="1"
+            id="player-count"
+            addonBefore="Player Count"
             onChange={val => this.setState({ maxPlayers: val })}
             value={this.state.maxPlayers}
             disabled={this.state.roomCreated}
