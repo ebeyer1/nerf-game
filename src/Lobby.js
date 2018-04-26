@@ -20,16 +20,20 @@ class Lobby extends Component {
     this.state = { 
       roomHash: props.match.params.hash,
       players: [],
-      roles: []
+      roles: [],
+      user: {},
+      startingGame: false,
+      gameStarted: false
     };
     // We want event handlers to share this context
     // this.createRoom = this.createRoom.bind(this);
+    this.startGame = this.startGame.bind(this);
     
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
       if (snapshot.exists) {
         var room = snapshot.data();
-        this.setState({ players: room.players, roles: room.roles });
+        this.setState({ players: room.players, roles: room.roles, creator: room.creator, totalPlayers: room.maxPlayers });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -66,12 +70,57 @@ class Lobby extends Component {
     });
     // [END authstatelistener]
   }
+  
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+  }
+  
+  pickOne(playerList) {
+    var idx = this.getRandomInt(0, playerList.length);
+    return playerList.splice(idx, 1);
+  }
 
+  startGame() {
+    if (this.state.players.length !== this.state.totalPlayers) return;
+    console.log('assigning roles...');
+    this.setState({ startingGame: true });
+    
+    var availableRoles = Object.assign([], this.state.roles);
+    
+    for(var i = 0; i < this.state.players.length; i++) {
+      var player = this.state.players[i];
+      var role = this.pickOne(availableRoles);
+      console.log('player: ' + player + '. Assigned: ' + role);
+    }
+    
+    this.setState({ startingGame: false, gameStarted: true });
+  }
+  
   // TODO - allow user to set info here?
   // TODO - add an /account page that lets the user set a name for their anonymous account?
   //        then display the name instead of id in views.
   render() {
     let roles = this.state.roles.join(", ");
+    
+    let currentUserId = '';
+    if (this.state.user) {
+      currentUserId = this.state.user.uid;
+    }
+    let creator = currentUserId === this.state.creator;
+    let startGameButton = creator ? (
+      <Button
+        className="Lobby-start-game-button"
+        size="large"
+        type="primary"
+        onClick={this.startGame}
+        loading={this.state.startingGame}
+        disabled={this.state.startingGame || (this.state.players.length !== this.state.totalPlayers)}
+      >
+        Start Game
+      </Button>
+    ) : "";
     
     return (
       <Layout className="Home">
@@ -82,6 +131,9 @@ class Lobby extends Component {
           <div>
             <hr />
             <h2>Room Code: {this.state.roomHash}</h2>
+            <br />
+            {startGameButton}
+            <br />
             <h4>Players</h4>
             <List
               className="Home-players"

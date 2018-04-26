@@ -138,8 +138,7 @@ class RoleList extends Component {
       return <Col span={4} className={classString} onClick={() => this.selectRole(r)}><div>{r.name}</div></Col>
     });
     
-    // TODO - Add a start button to assign roles... but, don't allow starting until enough roles have been selected.
-    //        Let game owner change the roles in the lobby view as well. (use same RoleList component)
+    // TODO - Let game owner change the roles in the lobby view as well. (use same RoleList component)
     
     return (
       <div className="role-list-container">
