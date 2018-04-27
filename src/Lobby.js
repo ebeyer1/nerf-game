@@ -82,6 +82,16 @@ class Lobby extends Component {
     return playerList.splice(idx, 1);
   }
 
+  // TODO - once gameStarted: true....
+  //        update the room document to indicate the game started, as well as all the user roles
+  //        when users detect game started either change content of page, or redirect them to /game/{hash}
+  //        this page shows an error if the room is not in an active/started state
+  //        this page shows the character their role with information (actions / team)
+  //        the game creator can click begin
+  //        add a "dead" button. Game ends when only one team remaining.
+  //        first pass - don't implement any roles. Just have city vs mob. dead vs alive. City or mob wins.
+  //        then implement specific roles if needed
+  //        allow users to specify a name, or eventually login with google or something
   startGame() {
     if (this.state.players.length !== this.state.totalPlayers) return;
     console.log('assigning roles...');
