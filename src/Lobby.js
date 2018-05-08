@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Layout, Input, InputNumber, Button, List, Icon } from "antd";
 import firebaseApp from "@firebase/app";
-import * as firebase from "firebase";
 import { Link } from 'react-router-dom';
 
 // We import our firestore module
@@ -15,9 +14,9 @@ class Lobby extends Component {
   constructor(props) {
     super(props);
     // Set the default state of our application
-    
+
     console.log('lobby props', props, props.match.params.hash);
-    this.state = { 
+    this.state = {
       roomHash: props.match.params.hash,
       players: [],
       roles: [],
@@ -28,7 +27,7 @@ class Lobby extends Component {
     // We want event handlers to share this context
     // this.createRoom = this.createRoom.bind(this);
     this.startGame = this.startGame.bind(this);
-    
+
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
       if (snapshot.exists) {
@@ -38,11 +37,11 @@ class Lobby extends Component {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
     });
-    
+
     // TODO - do auth in a single place...
     // Listening for auth state changes.
     // [START authstatelistener]
-    firebase.auth().onAuthStateChanged(user => {
+    firebaseApp.auth().onAuthStateChanged(user => {
       console.log('user', user);
       if (user) {
         // User is signed in.
@@ -70,13 +69,13 @@ class Lobby extends Component {
     });
     // [END authstatelistener]
   }
-  
+
   getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
   }
-  
+
   pickOne(playerList) {
     var idx = this.getRandomInt(0, playerList.length);
     return playerList.splice(idx, 1);
@@ -96,24 +95,24 @@ class Lobby extends Component {
     if (this.state.players.length !== this.state.totalPlayers) return;
     console.log('assigning roles...');
     this.setState({ startingGame: true });
-    
+
     var availableRoles = Object.assign([], this.state.roles);
-    
+
     for(var i = 0; i < this.state.players.length; i++) {
       var player = this.state.players[i];
       var role = this.pickOne(availableRoles);
       console.log('player: ' + player + '. Assigned: ' + role);
     }
-    
+
     this.setState({ startingGame: false, gameStarted: true });
   }
-  
+
   // TODO - allow user to set info here?
   // TODO - add an /account page that lets the user set a name for their anonymous account?
   //        then display the name instead of id in views.
   render() {
     let roles = this.state.roles.join(", ");
-    
+
     let currentUserId = '';
     if (this.state.user) {
       currentUserId = this.state.user.uid;
@@ -131,7 +130,7 @@ class Lobby extends Component {
         Start Game
       </Button>
     ) : "";
-    
+
     return (
       <Layout className="Home">
         <Content className="Home-content">

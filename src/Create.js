@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Layout, Input, InputNumber, Button, List, Icon } from "antd";
 import firebaseApp from "@firebase/app";
-import * as firebase from "firebase";
 import { Link, Redirect } from 'react-router-dom';
 import RoleList from './RoleList';
 
@@ -18,7 +17,7 @@ class Create extends Component {
   constructor(props) {
     super(props);
     // Set the default state of our application
-    this.state = { 
+    this.state = {
       creatingRoom: false,
       roomCreated: false,
       maxPlayers: 2,
@@ -35,8 +34,8 @@ class Create extends Component {
 
     // TODO - next steps:
     // TODO - in the lobby view, the creator can manage... start game, add players, destroy lobby
-    //        destroying lobby takes user back to home page    
-    
+    //        destroying lobby takes user back to home page
+
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
       if (snapshot.exists) {
@@ -44,10 +43,10 @@ class Create extends Component {
         this.setState({ players: room.players });
       }
     });
-    
+
     // Listening for auth state changes.
     // [START authstatelistener]
-    firebase.auth().onAuthStateChanged(user => {
+    firebaseApp.auth().onAuthStateChanged(user => {
       console.log('user', user);
       if (user) {
         // User is signed in.
@@ -75,7 +74,7 @@ class Create extends Component {
     });
     // [END authstatelistener]
   }
-  
+
   getHash() {
     const length = 4;
     var text = "";
@@ -87,7 +86,7 @@ class Create extends Component {
 
     return text;
   }
-  
+
   async createRoom() {
     if (!this.state.loggedIn) return;
     if (this.state.maxPlayers < 2) return;
@@ -105,7 +104,7 @@ class Create extends Component {
     await firestore.collection("rooms").doc(this.state.roomHash).set({
       timestamp: firebaseApp.firestore.FieldValue.serverTimestamp(),
       private: false,
-      maxPlayers: this.state.maxPlayers,  
+      maxPlayers: this.state.maxPlayers,
       creator: this.state.user.uid,
       players: players,
       roles: this.state.roles
@@ -113,12 +112,12 @@ class Create extends Component {
     console.log('req finished');
     // Remove the loading flag and clear the input
     this.setState({ creatingRoom: false, roomCreated: true, toLobbyHash: this.state.roomHash });
-    
-    
+
+
     // TODO - navigate to new lobby page
     // this.context.router.transitionTo('/lobby/' + this.state.roomHash);
   }
-  
+
   handleRoleSelected(role) {
     console.log('inside handleRoleSelected', role);
     var roleList = this.state.roles || [];
@@ -141,7 +140,7 @@ class Create extends Component {
       let lobbyUrl = '/lobby/' + this.state.toLobbyHash;
       return <Redirect to={lobbyUrl} />
     }
-    
+
     return (
       <Layout className="Home">
         <Content className="Home-content">

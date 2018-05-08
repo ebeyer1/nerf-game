@@ -4,9 +4,10 @@
   "private": true,
   "dependencies": {
     "@firebase/app": "^0.1.10",
-    "@firebase/firestore": "^0.3.6",
+    "@firebase/firestore": "^0.3.7",
     "antd": "^3.3.3",
-    "firebase": "^4.12.0",
+    "firebase": "^4.13.1",
+    "firebase-auth": "^0.1.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts": "1.1.1"

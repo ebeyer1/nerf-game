@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Layout, Input, Button, List, Icon } from "antd";
-import * as firebase from "firebase";
+import firebaseApp from "@firebase/app";
 import { Link, Redirect } from 'react-router-dom';
 
 // We import our firestore module
@@ -14,7 +14,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     // Set the default state of our application
-    this.state = { 
+    this.state = {
       creatingRoom: false, joiningRoom: false, deletingRoom: false,
       rooms: [],
       loggedIn: false,
@@ -45,7 +45,7 @@ class Home extends Component {
 
     // Listening for auth state changes.
     // [START authstatelistener]
-    firebase.auth().onAuthStateChanged(user => {
+    firebaseApp.auth().onAuthStateChanged(user => {
       console.log('user', user);
       if (user) {
         // User is signed in.
@@ -78,14 +78,14 @@ class Home extends Component {
     if (!this.state.loggedIn) return;
     console.log('join room', id);
     if (this.state.joiningRoom) return;
-    
+
     // TODO - if already in room, don't join...
-    
+
     this.setState({ joiningRoom: true });
     let roomRef = await firestore
       .collection("rooms")
       .doc(id);
-      
+
     let room = await roomRef.get();
     console.log('room ', room);
     let data = room.data();
@@ -100,28 +100,28 @@ class Home extends Component {
           players: playerList
         });
     }
-    
+
     this.setState({ joiningRoom: false, toLobbyHash: id });
   }
-  
+
   async deleteRoom(id) {
     if (!this.state.loggedIn) return;
     console.log('deleting room');
     if (this.state.deletingRoom) return;
-    
+
     this.setState({deletingRoom: true});
-    
+
     await firestore.collection("rooms").doc(id).delete();
-    
+
     this.setState({ deletingRoom : false});
   }
-  
+
   async toggleSignIn() {
     if (this.state.loggedIn) {
-      await firebase.auth().signOut();
+      await firebaseApp.auth().signOut();
     } else {
       try {
-        await firebase.auth().signInAnonymously();
+        await firebaseApp.auth().signInAnonymously();
       }
       catch (error) {
         // Handle Errors here.
@@ -142,18 +142,18 @@ class Home extends Component {
       let lobbyUrl = '/lobby/' + this.state.toLobbyHash;
       return <Redirect to={lobbyUrl} />
     }
-    
+
     // TODO - look below
     // see here for an actual login implementation: https://reactjs.org/docs/conditional-rendering.html
     // and https://github.com/firebase/quickstart-js/blob/master/auth/README.md
     const isLoggedIn = this.state.loggedIn;
-    
+
     const buttonText = isLoggedIn ? (
       <span>Sign Out</span>
     ) : (
       <span>Sign In</span>
     );
-    
+
     return (
       <Layout className="Home">
         <Header className="Home-header">
