@@ -107,7 +107,8 @@ class Create extends Component {
       maxPlayers: this.state.maxPlayers,
       creator: this.state.user.uid,
       players: players,
-      roles: this.state.roles
+      roles: this.state.roles,
+      roleArr: []
     });
     console.log('req finished');
     // Remove the loading flag and clear the input

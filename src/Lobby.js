@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Layout, Input, InputNumber, Button, List, Icon } from "antd";
 import firebaseApp from "@firebase/app";
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 // We import our firestore module
 import firestore from "./firestore";
@@ -82,8 +82,6 @@ class Lobby extends Component {
   }
 
   // TODO - once gameStarted: true....
-  //        when users detect game started either change content of page, or redirect them to /game/{hash}
-  //        this page shows an error if the room is not in an active/started state
   //        this page shows the character their role with information (actions / team)
   //        the game creator can click begin
   //        add a "dead" button. Game ends when only one team remaining.
@@ -122,6 +120,11 @@ class Lobby extends Component {
   // TODO - add an /account page that lets the user set a name for their anonymous account?
   //        then display the name instead of id in views.
   render() {
+    if (this.state.gameStarted) {
+      let gameUrl = '/game/' + this.state.roomHash;
+      return <Redirect to={gameUrl} />
+    }
+
     let roles = this.state.roles.join(", ");
 
     let currentUserId = '';

@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom';
 import Home from "./Home";
 import Create from "./Create";
 import Lobby from './Lobby';
+import Game from './Game';
 
 import "./App.css";
 
@@ -13,6 +14,7 @@ const App = () => (
       <Route exact path="/" component={Home} />
       <Route path="/create" component={Create} />
       <Route path="/lobby/:hash" component={Lobby} />
+      <Route path="/game/:hash" component={Game} />
     </div>
   </Router>
 )
