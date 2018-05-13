@@ -25,7 +25,7 @@ class Game extends Component {
       gameStarted: true // default to true unless server says otherwise
     };
     // We want event handlers to share this context
-    // this.createRoom = this.createRoom.bind(this);
+    this.beginMatch = this.beginMatch.bind(this);
     // this.startGame = this.startGame.bind(this);
 
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
@@ -43,7 +43,11 @@ class Game extends Component {
           }
         }
 
-        this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, rolesArr: room.roleArr });
+console.log('loaded beginsAt', room.beginsAt, new Date(room.beginsAt));
+        this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, rolesArr: room.roleArr, creator: room.creator,
+            beginsAt: room.beginsAt,
+            matchLength: room.matchLength
+         });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -90,6 +94,25 @@ class Game extends Component {
     // [END authstatelistener]
   }
 
+  async beginMatch() {
+    this.setState({ beginningMatch: true });
+
+    let roomRef = await firestore
+      .collection("rooms")
+      .doc(this.state.roomHash);
+
+    var now = new Date();
+    now.setSeconds(now.getSeconds() + 10);
+    await roomRef
+      .update({
+        activeGame: true,
+        beginsAt: now,
+        matchLength: 300
+      });
+
+    this.setState({ beginningMatch: false, activeGame: true, beginsAt: now, matchLength: 300 });
+  }
+
   render() {
     if (!this.state.gameStarted) {
       let lobbyUrl = '/lobby/' + this.state.roomHash;
@@ -121,6 +144,37 @@ class Game extends Component {
       </div>
     ) : ""; // support the whole arrays at some point.
 
+    let currentUserId = '';
+    if (this.state.user) {
+      currentUserId = this.state.user.uid;
+    }
+    let creator = currentUserId === this.state.creator;
+    let beginMatchButton = creator ? (
+      <Button
+        className="Lobby-begin-match-button"
+        size="large"
+        type="primary"
+        onClick={this.beginMatch}
+        loading={this.state.beginningMatch}
+        disabled={this.state.beginningMatch || this.state.activeGame}
+      >
+        Begin Match
+      </Button>
+    ) : "";
+
+    var now = new Date();
+    console.log('this.beginsAt', this.state.beginsAt);
+    var timer = this.state.beginsAt ? (this.state.beginsAt - now) / 1000 : "";
+    console.log('timer', timer);
+    var endTimer = '';
+    if (this.state.beginsAt) {
+      var endDate = this.state.beginsAt;
+      endDate.setSeconds(endDate.getSeconds() + this.state.matchLength);
+      endTimer = (endDate - now) / 1000;
+    }
+    // TODO - figure out how to show the timer couting down in react
+    console.log('endTimer', endTimer);
+
     return (
       <Layout className="Home">
         <Content className="Home-content">
@@ -129,6 +183,12 @@ class Game extends Component {
           </div>
           <div>
             <h2>Room Code: {this.state.roomHash}</h2>
+            <br />
+            Click this button to begin playing the game...
+            {beginMatchButton}
+            <br />
+            Begin time: {timer}
+            End timer: {endTimer}
             <br />
             <h4>Role Info</h4>
             {roleInfoDisplay}
