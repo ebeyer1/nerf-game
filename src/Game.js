@@ -3,6 +3,7 @@ import { Layout, Input, InputNumber, Button, List, Icon } from "antd";
 import firebaseApp from "@firebase/app";
 import { Link, Redirect } from 'react-router-dom';
 import Roles from './Roles';
+import Teams from './Teams';
 
 // We import our firestore module
 import firestore from "./firestore";
@@ -41,7 +42,7 @@ class Game extends Component {
             }
           }
         }
-        
+
         this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, rolesArr: room.roleArr });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
@@ -96,13 +97,29 @@ class Game extends Component {
     }
 
     let roleInfo = Roles.find(r => r.id === this.state.playerRole);
+    let winCondition = '';
+    if (roleInfo) {
+      winCondition = roleInfo.specialWinCondition;
+      if (!winCondition) {
+        let teamInfo = Teams.find(t => t.id === roleInfo.team);
+        winCondition = teamInfo.winCondition;
+      }
+    }
     let roleInfoDisplay = roleInfo ? (
       <div>
         Role: {roleInfo.name}
         <br />
         Team: {roleInfo.team}
+        <br />
+        Win Condition: {winCondition}
+        <br />
+        Description: {roleInfo.description}
+        <br />
+        Abilities: {roleInfo.abilities}
+        <br />
+        Traits: {roleInfo.traits}
       </div>
-    ) : "";
+    ) : ""; // support the whole arrays at some point.
 
     return (
       <Layout className="Home">
