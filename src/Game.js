@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Layout, Input, InputNumber, Button, List, Icon } from "antd";
 import firebaseApp from "@firebase/app";
 import { Link, Redirect } from 'react-router-dom';
+import Roles from './Roles';
 
 // We import our firestore module
 import firestore from "./firestore";
@@ -40,7 +41,8 @@ class Game extends Component {
             }
           }
         }
-        this.setState({ player: player, gameStarted: room.gameStarted, rolesArr: room.roleArr });
+        
+        this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, rolesArr: room.roleArr });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -64,7 +66,7 @@ class Game extends Component {
             }
           }
         }
-        this.setState({loggedIn: true, player: player});
+        this.setState({loggedIn: true, playerName: player.player, playerRole: player.role,});
         // [START_EXCLUDE]
         // document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
         // document.getElementById('quickstart-sign-in').textContent = 'Sign out';
@@ -93,7 +95,14 @@ class Game extends Component {
       return <Redirect to={lobbyUrl} />
     }
 
-    let gameStartedText = this.state.gameStarted ? "True" : "False";
+    let roleInfo = Roles.find(r => r.id === this.state.playerRole);
+    let roleInfoDisplay = roleInfo ? (
+      <div>
+        Role: {roleInfo.name}
+        <br />
+        Team: {roleInfo.team}
+      </div>
+    ) : "";
 
     return (
       <Layout className="Home">
@@ -104,12 +113,8 @@ class Game extends Component {
           <div>
             <h2>Room Code: {this.state.roomHash}</h2>
             <br />
-            Game Started: {gameStartedText}
-            <br />
-            <h4>Player</h4>
-            {this.state.player.player}
-            <h4>Role</h4>
-            {this.state.player.role}
+            <h4>Role Info</h4>
+            {roleInfoDisplay}
           </div>
         </Content>
       </Layout>

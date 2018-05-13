@@ -15,7 +15,6 @@ class Lobby extends Component {
     super(props);
     // Set the default state of our application
 
-    console.log('lobby props', props, props.match.params.hash);
     this.state = {
       roomHash: props.match.params.hash,
       players: [],
@@ -76,13 +75,12 @@ class Lobby extends Component {
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
   }
 
-  pickOne(playerList) {
-    var idx = this.getRandomInt(0, playerList.length);
-    return playerList.splice(idx, 1);
+  pickOne(roleList) {
+    var idx = this.getRandomInt(0, roleList.length);
+    return roleList.splice(idx, 1)[0];
   }
 
   // TODO - once gameStarted: true....
-  //        this page shows the character their role with information (actions / team)
   //        the game creator can click begin
   //        add a "dead" button. Game ends when only one team remaining.
   //        first pass - don't implement any roles. Just have city vs mob. dead vs alive. City or mob wins.
@@ -90,7 +88,6 @@ class Lobby extends Component {
   //        allow users to specify a name, or eventually login with google or something
   async startGame() {
     if (this.state.players.length !== this.state.totalPlayers) return;
-    console.log('assigning roles...');
     this.setState({ startingGame: true });
 
     var availableRoles = Object.assign([], this.state.roles);
