@@ -32,7 +32,7 @@ class Lobby extends Component {
       console.log('heres my snapshot', snapshot);
       if (snapshot.exists) {
         var room = snapshot.data();
-        this.setState({ players: room.players, roles: room.roles, creator: room.creator, totalPlayers: room.maxPlayers });
+        this.setState({ players: room.players, roles: room.roles, creator: room.creator, totalPlayers: room.maxPlayers, gameStarted: room.gameStarted });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -82,7 +82,6 @@ class Lobby extends Component {
   }
 
   // TODO - once gameStarted: true....
-  //        update the room document to indicate the game started, as well as all the user roles
   //        when users detect game started either change content of page, or redirect them to /game/{hash}
   //        this page shows an error if the room is not in an active/started state
   //        this page shows the character their role with information (actions / team)
@@ -91,20 +90,32 @@ class Lobby extends Component {
   //        first pass - don't implement any roles. Just have city vs mob. dead vs alive. City or mob wins.
   //        then implement specific roles if needed
   //        allow users to specify a name, or eventually login with google or something
-  startGame() {
+  async startGame() {
     if (this.state.players.length !== this.state.totalPlayers) return;
     console.log('assigning roles...');
     this.setState({ startingGame: true });
 
     var availableRoles = Object.assign([], this.state.roles);
 
+    var roleArr = [];
     for(var i = 0; i < this.state.players.length; i++) {
       var player = this.state.players[i];
       var role = this.pickOne(availableRoles);
       console.log('player: ' + player + '. Assigned: ' + role);
+      roleArr.push({ player, role });
     }
 
     this.setState({ startingGame: false, gameStarted: true });
+
+    let roomRef = await firestore
+      .collection("rooms")
+      .doc(this.state.roomHash);
+
+    await roomRef
+      .update({
+        gameStarted: true,
+        roleArr: roleArr
+      }); // todo - later combine the player list and the roleArr list...
   }
 
   // TODO - allow user to set info here?
@@ -125,11 +136,12 @@ class Lobby extends Component {
         type="primary"
         onClick={this.startGame}
         loading={this.state.startingGame}
-        disabled={this.state.startingGame || (this.state.players.length !== this.state.totalPlayers)}
+        disabled={this.state.startingGame || this.state.gameStarted || (this.state.players.length !== this.state.totalPlayers)}
       >
         Start Game
       </Button>
     ) : "";
+    let gameStartedText = this.state.gameStarted ? "True" : "False";
 
     return (
       <Layout className="Home">
@@ -142,6 +154,8 @@ class Lobby extends Component {
             <h2>Room Code: {this.state.roomHash}</h2>
             <br />
             {startGameButton}
+            <br />
+            Game Started: {gameStartedText}
             <br />
             <h4>Players</h4>
             <List

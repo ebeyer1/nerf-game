@@ -8,6 +8,8 @@ import firestore from "./firestore";
 
 import "./Home.css";
 
+require('firebase/auth');
+
 const { Header, Footer, Content } = Layout;
 
 class Home extends Component {
