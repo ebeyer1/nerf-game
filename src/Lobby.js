@@ -85,6 +85,7 @@ class Lobby extends Component {
   //        first pass - don't implement any roles. Just have city vs mob. dead vs alive. City or mob wins.
   //        then implement specific roles if needed
   //        allow users to specify a name, or eventually login with google or something
+  //        add a timer?
   async startGame() {
     if (this.state.players.length !== this.state.totalPlayers) return;
     this.setState({ startingGame: true });

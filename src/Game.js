@@ -26,7 +26,7 @@ class Game extends Component {
     };
     // We want event handlers to share this context
     this.iDied = this.iDied.bind(this);
-    // this.startGame = this.startGame.bind(this);
+    this.resetGame = this.resetGame.bind(this);
 
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
@@ -44,7 +44,7 @@ class Game extends Component {
         }
 
         this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
-        winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead });
+        winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead, roles: room.roles, players: room.players });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -144,6 +144,49 @@ class Game extends Component {
       this.setState({winningTeam: winningTeam, gameOver: gameOver, iAmDead: died, iAmDying: false});
   }
 
+  async resetGame() {
+    this.setState({resettingGame:true});
+
+    let roomRef = await firestore
+      .collection("rooms")
+      .doc(this.state.roomHash);
+
+    let room = await roomRef.get();
+
+    let roomData = room.data();
+
+    var availableRoles = Object.assign([], this.state.roles);
+
+    var roleArr = [];
+    for(var i = 0; i < this.state.players.length; i++) {
+      var player = this.state.players[i];
+      var role = this.pickOne(availableRoles);
+      console.log('player: ' + player + '. Assigned: ' + role);
+      roleArr.push({ player, role });
+    }
+
+    await roomRef
+      .update({
+        roleArr: roleArr,
+        winningTeam: '',
+        gameOver: false
+      });
+
+    this.setState({resettingGame: false});
+  }
+
+  // todo - getRandomInt and pickOne shouldn't be duplicated in Game and Lobby
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+  }
+
+  pickOne(roleList) {
+    var idx = this.getRandomInt(0, roleList.length);
+    return roleList.splice(idx, 1)[0];
+  }
+
   render() {
     if (!this.state.gameStarted) {
       let lobbyUrl = '/lobby/' + this.state.roomHash;
@@ -175,8 +218,24 @@ class Game extends Component {
       </div>
     ) : ""; // support the whole arrays at some point.
 
+    let resetGameButton = (
+      <Button
+        className="Game-reset-button"
+        size="large"
+        type="primary"
+        onClick={this.resetGame}
+        loading={this.state.resettingGame}
+        disabled={this.state.resettingGame}
+      >
+        Reset Game
+      </Button>
+    );
+
     let gameOverMessage = this.state.gameOver ? (
-      <h1>Game Over: {this.state.winningTeam} Wins!</h1>
+      <div>
+        <h1>Game Over: {this.state.winningTeam} Wins!</h1>
+        {resetGameButton} (Re-assign roles)
+      </div>
     ) : '';
 
     let deadButtonText = this.state.iAmDead ? 'Dead :/' : 'I died';
