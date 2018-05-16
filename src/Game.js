@@ -25,7 +25,7 @@ class Game extends Component {
       gameStarted: true // default to true unless server says otherwise
     };
     // We want event handlers to share this context
-    // this.createRoom = this.createRoom.bind(this);
+    this.iDied = this.iDied.bind(this);
     // this.startGame = this.startGame.bind(this);
 
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
@@ -43,7 +43,8 @@ class Game extends Component {
           }
         }
 
-        this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, rolesArr: room.roleArr });
+        this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
+        winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -59,10 +60,10 @@ class Game extends Component {
         var isAnonymous = user.isAnonymous;
         var uid = user.uid;
         let player = this.state.player;
-        if (!this.state.player && this.state.rolesArr) {
-          for (var i = 0; i < this.state.rolesArr.length; i++) {
-            if (this.state.rolesArr[i].player === uid) {
-              player = this.state.rolesArr[i];
+        if (!this.state.player && this.state.roleArr) {
+          for (var i = 0; i < this.state.roleArr.length; i++) {
+            if (this.state.roleArr[i].player === uid) {
+              player = this.state.roleArr[i];
               break;
             }
           }
@@ -88,6 +89,59 @@ class Game extends Component {
       // [END_EXCLUDE]
     });
     // [END authstatelistener]
+  }
+
+  async iDied() {
+    this.setState({iAmDying:true});
+
+    let roomRef = await firestore
+      .collection("rooms")
+      .doc(this.state.roomHash);
+
+    let room = await roomRef.get();
+
+    let roomData = room.data();
+
+    let died = false;
+    let updatedRoleArr = roomData.roleArr.map(role => {
+      if (role.player === this.state.user.uid) {
+        died = true;
+        role.dead = true;
+      }
+      return role;
+    });
+
+    let alivePlayers = updatedRoleArr.filter(r => r.dead !== true); // accounts for r.dead being null
+
+    let remainingTeams = alivePlayers.map(p => {
+      var roleId = p.role;
+      var role = Roles.find(r => r.id === roleId);
+      return role.team;
+    });
+    let mobPlayers = remainingTeams.filter(t => t === "mob");
+    let winningTeam = '';
+    if (mobPlayers.length === remainingTeams.length) {
+      winningTeam = 'mob';
+    } else if (mobPlayers.length > 0) {
+      winningTeam = '';
+    } else {
+      var neutralPlayers = remainingTeams.filter(t => t === "neutral");
+      if (neutralPlayers.length >= 1) {
+        winningTeam = 'Martyr'; // only using martyr bc they are the only neutral at the moment.
+      } else {
+        winningTeam = 'city';
+      }
+    }
+
+    let gameOver = winningTeam !== '';
+    await roomRef
+      .update({
+        roleArr: updatedRoleArr,
+        winningTeam: winningTeam,
+        gameOver: gameOver
+      });
+
+      this.setState({winningTeam: winningTeam, gameOver: gameOver, iAmDead: died, iAmDying: false});
   }
 
   render() {
@@ -121,6 +175,12 @@ class Game extends Component {
       </div>
     ) : ""; // support the whole arrays at some point.
 
+    let gameOverMessage = this.state.gameOver ? (
+      <h1>Game Over: {this.state.winningTeam} Wins!</h1>
+    ) : '';
+
+    let deadButtonText = this.state.iAmDead ? 'Dead :/' : 'I died';
+
     return (
       <Layout className="Home">
         <Content className="Home-content">
@@ -130,8 +190,21 @@ class Game extends Component {
           <div>
             <h2>Room Code: {this.state.roomHash}</h2>
             <br />
+            {gameOverMessage}
             <h4>Role Info</h4>
             {roleInfoDisplay}
+
+            <br />
+            <Button
+              className="Lobby-i-died-button"
+              size="large"
+              type="danger"
+              onClick={this.iDied}
+              loading={this.state.iAmDying}
+              disabled={this.state.iAmDying || this.state.iAmDead}
+            >
+              {deadButtonText}
+            </Button>
           </div>
         </Content>
       </Layout>

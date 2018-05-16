@@ -82,7 +82,6 @@ class Lobby extends Component {
 
   // TODO - once gameStarted: true....
   //        the game creator can click begin
-  //        add a "dead" button. Game ends when only one team remaining.
   //        first pass - don't implement any roles. Just have city vs mob. dead vs alive. City or mob wins.
   //        then implement specific roles if needed
   //        allow users to specify a name, or eventually login with google or something
