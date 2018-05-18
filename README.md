@@ -6,7 +6,9 @@
 * `npm install`
 * Add `/src/firestore.js` file with firestore config
 
-
+* Deployment instructions from here: https://www.codementor.io/yurio/all-you-need-is-react-firebase-4v7g9p4kf
+  1. npm run build
+  2. firebase deploy
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
