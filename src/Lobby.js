@@ -87,7 +87,10 @@ class Lobby extends Component {
   //        allow users to specify a name, or eventually login with google or something
   //        add a timer?
   async startGame() {
-    if (this.state.players.length !== this.state.totalPlayers) return;
+    if (this.state.players.length !== this.state.totalPlayers) {
+      alert('Need ' + this.state.totalPlayers + ' players to begin');
+      return;
+    }
     this.setState({ startingGame: true });
 
     var availableRoles = Object.assign([], this.state.roles);

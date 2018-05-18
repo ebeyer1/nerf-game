@@ -88,19 +88,25 @@ class Create extends Component {
   }
 
   async createRoom() {
-    if (!this.state.loggedIn) return;
-    if (this.state.maxPlayers < 2) return;
-    if (this.state.roles.length !== this.state.maxPlayers + 3) return;
-    console.log('creating room', this.state.creatingRoom);
+    if (!this.state.loggedIn) {
+      alert('Must be logged in!');
+      return;
+    }
+    if (this.state.maxPlayers < 2) {
+      alert('Must have at least 2 players to create game!');
+      return;
+    }
+    if (this.state.roles.length !== this.state.maxPlayers + 3) {
+      alert('Must select ' + (this.state.maxPlayers + 3) + ' roles to begin!');
+      return;
+    }
     if (this.state.creatingRoom) return;
     // Set a flag to indicate loading
     this.setState({ creatingRoom: true });
     // Add a new todo from the value of the input
     let that = this;
-    console.log('make req');
     var players = [this.state.user.uid];
     this.setState({ players: players });
-    console.log('about the create with hash...', this.state.roomHash);
     await firestore.collection("rooms").doc(this.state.roomHash).set({
       timestamp: firebaseApp.firestore.FieldValue.serverTimestamp(),
       private: false,
@@ -110,27 +116,21 @@ class Create extends Component {
       roles: this.state.roles,
       roleArr: []
     });
-    console.log('req finished');
     // Remove the loading flag and clear the input
     this.setState({ creatingRoom: false, roomCreated: true, toLobbyHash: this.state.roomHash });
-
 
     // TODO - navigate to new lobby page
     // this.context.router.transitionTo('/lobby/' + this.state.roomHash);
   }
 
   handleRoleSelected(role) {
-    console.log('inside handleRoleSelected', role);
     var roleList = this.state.roles || [];
     var index = roleList.indexOf(role.id);
-    console.log('role lsit and index', roleList, index);
     if (index === -1) {
-      console.log('adding');
       if (roleList.length < this.state.maxPlayers + 3) {
         roleList.push(role.id);
       }
     } else {
-      console.log('removing');
       roleList.splice(index, 1);
     }
     this.setState({ roles: roleList });
