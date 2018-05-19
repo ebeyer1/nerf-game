@@ -208,17 +208,17 @@ class Game extends Component {
     }
     let roleInfoDisplay = roleInfo ? (
       <div>
-        Role: {roleInfo.name}
+        <strong>Role</strong>: {roleInfo.name}
         <br />
-        Team: {roleInfo.team}
+        <strong>Team</strong>: {roleInfo.team}
         <br />
-        Win Condition: {winCondition}
+        <strong>Win Condition</strong>: {winCondition}
         <br />
-        Description: {roleInfo.description}
+        <strong>Description</strong>: {roleInfo.description}
         <br />
-        Abilities: {roleInfo.abilities}
+        <strong>Abilities</strong>: {roleInfo.abilities}
         <br />
-        Traits: {roleInfo.traits}
+        <strong>Traits</strong>: {roleInfo.traits}
       </div>
     ) : ""; // support the whole arrays at some point.
 
@@ -312,11 +312,6 @@ class Game extends Component {
             {gameOverMessage}
             <h4>Role Info</h4>
             {roleInfoDisplay}
-            <br />
-            
-            <div className="role-action-container">
-              {roleAction}
-            </div>
             
             <br />
             <Button
@@ -329,6 +324,11 @@ class Game extends Component {
             >
               {deadButtonText}
             </Button>
+            <br />
+            
+            <div className="role-action-container">
+              {roleAction}
+            </div>
           </div>
         </Content>
       </Layout>
