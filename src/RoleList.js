@@ -22,7 +22,7 @@ class RoleList extends Component {
       let selected = this.props.selectedRoles.indexOf(r.id) !== -1;
       let classString = "role " + r.team + (selected ? " selected" : "");
 
-      return <Col span={4} className={classString} onClick={() => this.selectRole(r)}><div>{r.name}</div></Col>
+      return <Col span={8} className={classString} onClick={() => this.selectRole(r)}><div>{r.name}</div></Col>
     });
 
     // TODO - Let game owner change the roles in the lobby view as well. (use same RoleList component)
