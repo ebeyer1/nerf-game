@@ -1,5 +1,9 @@
 @import "~antd/dist/antd.css";
 
+.ant-layout-header {
+  padding: 0 20px !important;
+}
+
 .App {
   text-align: center;
 }

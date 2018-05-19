@@ -93,8 +93,15 @@ class Home extends Component {
     let data = room.data();
     console.log('data ', data);
     let playerCount = data.playersInLobby || 1;
+    
     let playerList = data.players || [];
     if (!playerList.find(p => p.id === this.state.user.uid)) {
+      if (playerCount >= data.maxPlayers) {
+        alert('room is full');
+        this.setState({ joiningRoom: false });
+        return;
+      }
+      
       playerList.push({id: this.state.user.uid, displayName: this.state.user.displayName});
       await roomRef
         .update({
@@ -156,14 +163,19 @@ class Home extends Component {
     };
     
     const accountLinkStyle = {
-      fontSize: '10px',
-      marginLeft: '4px'
+      fontSize: '14px',
+    };
+    
+    const editNameContainerStyle = {
+      lineHeight: '28px'
     };
     
     const greeting = isLoggedIn ? (
       <div style={greetingStyle}>
         <span>Hello, {(this.state.user || {}).displayName || 'Guest User'}</span>
-        <Link to="/account" style={accountLinkStyle}>(Edit name)</Link>
+        <div style={editNameContainerStyle}>
+          <Link to="/account" style={accountLinkStyle}>(Edit name)</Link>
+        </div>
       </div>
     ) : (
       <div style={greetingStyle}>Please sign in</div>
@@ -186,6 +198,10 @@ class Home extends Component {
     const createMessage = isLoggedIn ?
       (hasDisplayName ? (<span></span>) : (<span>Please set a display name</span>)) :
       (<span>Please sign in</span>);
+      
+    const idStyle = {
+      fontSize: '18px'
+    };
 
     return (
       <Layout className="Home">
@@ -220,7 +236,7 @@ class Home extends Component {
             dataSource={this.state.rooms}
             renderItem={room => (
               <List.Item>
-                Id: {room.id}, Creator: {room.creatorName || 'Guest User'}
+                <strong style={idStyle}>Id: {room.id}</strong>
                 &nbsp;
                 <Button
                   onClick={evt => this.joinRoom(room.id)}
@@ -242,7 +258,6 @@ class Home extends Component {
                 >
                   Delete
                 </Button>
-                Players: {room.players.map(p => p.displayName)}
               </List.Item>
             )}
           />
