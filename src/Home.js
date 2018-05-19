@@ -178,6 +178,14 @@ class Home extends Component {
     ) : (
       <span>Sign In</span>
     );
+      
+    let hasDisplayName = isLoggedIn ?
+      this.state.user && this.state.user.displayName && this.state.user.displayName.length > 0 :
+      false;
+      
+    const createMessage = isLoggedIn ?
+      (hasDisplayName ? (<span></span>) : (<span>Please set a display name</span>)) :
+      (<span>Please sign in</span>);
 
     return (
       <Layout className="Home">
@@ -200,9 +208,11 @@ class Home extends Component {
             size="large"
             type="primary"
             href="/create"
+            disabled={!isLoggedIn || !hasDisplayName}
           >
             Create Room
           </Button>
+          {createMessage}
           <List
             className="Home-rooms"
             size="large"
@@ -218,6 +228,7 @@ class Home extends Component {
                   size="large"
                   type="primary"
                   loading={this.state.joiningRoom}
+                  disabled={!isLoggedIn || !hasDisplayName}
                 >
                   Join Room with {room.playersInLobby} other(s)
                 </Button>
@@ -227,6 +238,7 @@ class Home extends Component {
                   size="large"
                   type="danger"
                   loading={this.state.deletingRoom}
+                  disabled={!isLoggedIn}
                 >
                   Delete
                 </Button>
