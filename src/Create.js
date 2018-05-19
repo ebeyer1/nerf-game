@@ -105,13 +105,19 @@ class Create extends Component {
     this.setState({ creatingRoom: true });
     // Add a new todo from the value of the input
     let that = this;
-    var players = [this.state.user.uid];
+    var players = [
+      {
+        id: this.state.user.uid,
+        displayName: this.state.user.displayName
+      }
+    ];
     this.setState({ players: players });
     await firestore.collection("rooms").doc(this.state.roomHash).set({
       timestamp: firebaseApp.firestore.FieldValue.serverTimestamp(),
       private: false,
       maxPlayers: this.state.maxPlayers,
-      creator: this.state.user.uid,
+      creatorId: this.state.user.uid,
+      creatorName: this.state.user.displayName,
       players: players,
       roles: this.state.roles,
       roleArr: []

@@ -94,8 +94,8 @@ class Home extends Component {
     console.log('data ', data);
     let playerCount = data.playersInLobby || 1;
     let playerList = data.players || [];
-    if (playerList.indexOf(this.state.user.uid) === -1) {
-      playerList.push(this.state.user.uid);
+    if (!playerList.find(p => p.id === this.state.user.uid)) {
+      playerList.push({id: this.state.user.uid, displayName: this.state.user.displayName});
       await roomRef
         .update({
           playersInLobby: playerCount+1,
@@ -150,6 +150,29 @@ class Home extends Component {
     // and https://github.com/firebase/quickstart-js/blob/master/auth/README.md
     const isLoggedIn = this.state.loggedIn;
 
+    const greetingStyle = {
+      float: 'left',
+      color: 'whitesmoke'
+    };
+    
+    const accountLinkStyle = {
+      fontSize: '10px',
+      marginLeft: '4px'
+    };
+    
+    const greeting = isLoggedIn ? (
+      <div style={greetingStyle}>
+        <span>Hello, {(this.state.user || {}).displayName || 'Guest User'}</span>
+        <Link to="/account" style={accountLinkStyle}>(Edit name)</Link>
+      </div>
+    ) : (
+      <div style={greetingStyle}>Please sign in</div>
+    );
+    
+    const loggedInButtonStyle = {
+      float: 'right'
+    }
+    
     const buttonText = isLoggedIn ? (
       <span>Sign Out</span>
     ) : (
@@ -159,10 +182,12 @@ class Home extends Component {
     return (
       <Layout className="Home">
         <Header className="Home-header">
+          {greeting}
           <Button
             className="Home-sign-in-button"
-            size="large"
+            size="default"
             type="default"
+            style={loggedInButtonStyle}
             onClick={this.toggleSignIn}
           >
             {buttonText}
@@ -185,7 +210,7 @@ class Home extends Component {
             dataSource={this.state.rooms}
             renderItem={room => (
               <List.Item>
-                Id: {room.id}, Creator: {room.creator}
+                Id: {room.id}, Creator: {room.creatorName || 'Guest User'}
                 &nbsp;
                 <Button
                   onClick={evt => this.joinRoom(room.id)}
@@ -205,7 +230,7 @@ class Home extends Component {
                 >
                   Delete
                 </Button>
-                Players: {room.players}
+                Players: {room.players.map(p => p.displayName)}
               </List.Item>
             )}
           />

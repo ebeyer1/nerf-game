@@ -10,7 +10,7 @@ import "./Home.css";
 
 const { Header, Footer, Content } = Layout;
 
-class Lobby extends Component {
+class Lobby extends Component {  
   constructor(props) {
     super(props);
     // Set the default state of our application
@@ -23,6 +23,9 @@ class Lobby extends Component {
       startingGame: false,
       gameStarted: false
     };
+    
+    this.playerNameDict = {};
+    
     // We want event handlers to share this context
     // this.createRoom = this.createRoom.bind(this);
     this.startGame = this.startGame.bind(this);
@@ -31,7 +34,9 @@ class Lobby extends Component {
       console.log('heres my snapshot', snapshot);
       if (snapshot.exists) {
         var room = snapshot.data();
-        this.setState({ players: room.players, roles: room.roles, creator: room.creator, totalPlayers: room.maxPlayers, gameStarted: room.gameStarted });
+        let playerIds = room.players.map(p => p.id);
+        room.players.forEach(p => {this.playerNameDict[p.id] = p.displayName;});
+        this.setState({ players: playerIds, roles: room.roles, creatorId: room.creatorId, totalPlayers: room.maxPlayers, gameStarted: room.gameStarted });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -97,10 +102,10 @@ class Lobby extends Component {
 
     var roleArr = [];
     for(var i = 0; i < this.state.players.length; i++) {
-      var player = this.state.players[i];
+      var playerId = this.state.players[i];
       var role = this.pickOne(availableRoles);
-      console.log('player: ' + player + '. Assigned: ' + role);
-      roleArr.push({ player, role });
+      console.log('player: ' + playerId + '. Assigned: ' + role);
+      roleArr.push({ id: playerId, displayName: this.playerNameDict[playerId], role });
     }
 
     this.setState({ startingGame: false, gameStarted: true });
@@ -131,7 +136,7 @@ class Lobby extends Component {
     if (this.state.user) {
       currentUserId = this.state.user.uid;
     }
-    let creator = currentUserId === this.state.creator;
+    let creator = currentUserId === this.state.creatorId;
     let startGameButton = creator ? (
       <Button
         className="Lobby-start-game-button"
@@ -145,7 +150,7 @@ class Lobby extends Component {
       </Button>
     ) : "";
     let gameStartedText = this.state.gameStarted ? "True" : "False";
-
+    console.log('players', this.state.players);
     return (
       <Layout className="Home">
         <Content className="Home-content">
@@ -168,7 +173,7 @@ class Lobby extends Component {
               dataSource={this.state.players}
               renderItem={player => (
                 <List.Item>
-                  Id: {player}
+                  Name: {this.playerNameDict[player]}
                 </List.Item>
               )}
             />

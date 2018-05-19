@@ -36,15 +36,15 @@ class Game extends Component {
         var player = {};
         if (this.state.user && this.state.user.uid) {
           for(var i = 0; i < room.roleArr.length; i++) {
-            if (room.roleArr[i].player === this.state.user.uid) {
+            if (room.roleArr[i].id === this.state.user.uid) {
               player = room.roleArr[i];
               break;
             }
           }
         }
 
-        this.setState({ playerName: player.player, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
-        winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead, roles: room.roles, players: room.players });
+        this.setState({ playerId: player.id, playerName: player.displayName, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
+        winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead, roles: room.roles, players: room.players, creatorId: room.creatorId });
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
@@ -59,16 +59,20 @@ class Game extends Component {
         // User is signed in.
         var isAnonymous = user.isAnonymous;
         var uid = user.uid;
-        let player = this.state.player;
-        if (!this.state.player && this.state.roleArr) {
+        let playerId = this.state.playerId;
+        let playerName = this.state.playerName;
+        let playerRole = this.state.role;
+        if (!this.state.playerId && this.state.roleArr) {
           for (var i = 0; i < this.state.roleArr.length; i++) {
-            if (this.state.roleArr[i].player === uid) {
-              player = this.state.roleArr[i];
+            if (this.state.roleArr[i].id === uid) {
+              playerId = this.state.roleArr[i].id;
+              playerName = this.state.roleArr[i].displayName;
+              playerRole = this.state.roleArr[i].role;
               break;
             }
           }
         }
-        this.setState({loggedIn: true, playerName: player.player, playerRole: player.role,});
+        this.setState({loggedIn: true, playerId: playerId, playerName: playerName, playerRole: playerRole});
         // [START_EXCLUDE]
         // document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
         // document.getElementById('quickstart-sign-in').textContent = 'Sign out';
@@ -104,7 +108,7 @@ class Game extends Component {
 
     let died = false;
     let updatedRoleArr = roomData.roleArr.map(role => {
-      if (role.player === this.state.user.uid) {
+      if (role.id === this.state.user.uid) {
         died = true;
         role.dead = true;
       }
@@ -161,8 +165,8 @@ class Game extends Component {
     for(var i = 0; i < this.state.players.length; i++) {
       var player = this.state.players[i];
       var role = this.pickOne(availableRoles);
-      console.log('player: ' + player + '. Assigned: ' + role);
-      roleArr.push({ player, role });
+      console.log('player: ' + player.id + '. Assigned: ' + role);
+      roleArr.push({ id: player.id, displayName: player.displayName, role });
     }
 
     await roomRef
@@ -218,23 +222,35 @@ class Game extends Component {
       </div>
     ) : ""; // support the whole arrays at some point.
 
-    let resetGameButton = (
-      <Button
-        className="Game-reset-button"
-        size="large"
-        type="primary"
-        onClick={this.resetGame}
-        loading={this.state.resettingGame}
-        disabled={this.state.resettingGame}
-      >
-        Reset Game
-      </Button>
-    );
+    let currentUserId = '';
+    if (this.state.user) {
+      currentUserId = this.state.user.uid;
+    }
+    let creator = currentUserId === this.state.creatorId;
+    let resetGameButton = creator ? (
+      <div>
+        <Button
+          className="Game-reset-button"
+          size="large"
+          type="default"
+          onClick={this.resetGame}
+          loading={this.state.resettingGame}
+          disabled={this.state.resettingGame}
+        >
+          Reset Game
+        </Button> (Re-assign roles)
+      </div>
+    ) : ( <div></div> );
 
+    let winningTeam = roleInfo && roleInfo.team === this.state.winningTeam;
+    let gameWonStyle = {
+      backgroundColor: winningTeam ? 'lightgreen' : 'indianred'
+    };
+    
     let gameOverMessage = this.state.gameOver ? (
       <div>
-        <h1>Game Over: {this.state.winningTeam} Wins!</h1>
-        {resetGameButton} (Re-assign roles)
+        <h1 style={gameWonStyle}>Game Over: {this.state.winningTeam} Wins!</h1>
+        {resetGameButton}
       </div>
     ) : '';
 
