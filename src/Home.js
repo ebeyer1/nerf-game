@@ -202,6 +202,10 @@ class Home extends Component {
     const idStyle = {
       fontSize: '18px'
     };
+    
+    const createRoomButtonStyle = {
+      marginButton: '12px'
+    };
 
     return (
       <Layout className="Home">
@@ -216,7 +220,7 @@ class Home extends Component {
           >
             {buttonText}
           </Button>
-          <h1>NERF Game</h1>
+          <h1>NERF</h1>
         </Header>
         <Content className="Home-content">
           <Button
@@ -224,6 +228,7 @@ class Home extends Component {
             size="large"
             type="primary"
             href="/create"
+            style={createRoomButtonStyle}
             disabled={!isLoggedIn || !hasDisplayName}
           >
             Create Room

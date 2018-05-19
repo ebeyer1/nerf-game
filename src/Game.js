@@ -256,6 +256,50 @@ class Game extends Component {
 
     let deadButtonText = this.state.iAmDead ? 'Dead :/' : 'I died';
 
+    let roleAction = (<span></span>);
+    if (roleInfo && roleInfo.name === 'Citizen') {
+      roleAction = (
+        <div>
+          Citizen has no special action.
+        </div>
+      );
+    } else if (roleInfo && roleInfo.name === 'Detective') {
+      roleAction = (
+        <div>
+          Flash Badge to learn someones role
+          <br /><img src="/assets/detective-badge.png" />
+        </div>
+      );
+    } else if (roleInfo && roleInfo.name === 'Undercover Cop') {
+      roleAction = (
+        <div>
+          <ul>
+            <li>Attends mob meeting</li>
+            <li>Can NOT shoot mob members, or city loses</li>
+            <li>Can only speak to mob members</li>
+          </ul>
+        </div>
+      );
+    } /*else if (roleInfo && roleInfo.name === 'Witch') {
+      roleAction = (
+        <div>
+          NEED TO IMPLEMENT
+        </div>
+      );
+    }*/ else if (roleInfo && roleInfo.name === 'Mob Recruit') {
+      roleAction = (
+        <div>
+          Mob Recruit has no special action.
+        </div>
+      );
+    } /*else if (roleInfo && roleInfo.name === 'Mob Capo') {
+      roleAction = (
+        <div>
+          Mob Capo
+        </div>
+      );
+    }*/
+    
     return (
       <Layout className="Home">
         <Content className="Home-content">
@@ -268,7 +312,12 @@ class Game extends Component {
             {gameOverMessage}
             <h4>Role Info</h4>
             {roleInfoDisplay}
-
+            <br />
+            
+            <div className="role-action-container">
+              {roleAction}
+            </div>
+            
             <br />
             <Button
               className="Lobby-i-died-button"
