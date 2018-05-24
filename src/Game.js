@@ -29,6 +29,8 @@ class Game extends Component {
     this.resetGame = this.resetGame.bind(this);
     this.selectThiefRole = this.selectThiefRole.bind(this);
     this.selectPsychicRole = this.selectPsychicRole.bind(this);
+    this.selectDetectiveRole = this.selectDetectiveRole.bind(this);
+    this.selectCrookedCopRole = this.selectCrookedCopRole.bind(this);
 
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
@@ -246,6 +248,40 @@ class Game extends Component {
     
     this.setState({selectedPsychicRoles: selectedPsychicRoles, chosenPsychicRole: chosenRole});
   }
+  
+  selectDetectiveRole(user) {
+    var selectedDetectiveRole = this.state.selectedDetectiveRole || '';
+    if (selectedDetectiveRole) {
+      return;
+    }
+    selectedDetectiveRole = user;
+    let role = this.state.roleArr.find(r => r.displayName === user);
+    let actualRole = Roles.find(r => r.id === role.role);
+    
+    let chosenRole = actualRole.name;
+    if (chosenRole === 'Priest' || chosenRole === 'Mob boss') {
+      chosenRole = 'unsuccessful';
+    }
+    
+    this.setState({selectedDetectiveRole: selectedDetectiveRole, detectiveFoundRole: chosenRole});
+  }
+  
+  selectCrookedCopRole(user) {
+    var selectedCrookedCopRole = this.state.selectedCrookedCopRole || '';
+    if (selectedCrookedCopRole) {
+      return;
+    }
+    selectedCrookedCopRole = user;
+    let role = this.state.roleArr.find(r => r.displayName === user);
+    let actualRole = Roles.find(r => r.id === role.role);
+    
+    let chosenRole = actualRole.name;
+    if (chosenRole === 'Priest' || chosenRole === 'Mob boss') {
+      chosenRole = 'unsuccessful';
+    }
+    
+    this.setState({selectedCrookedCopRole: selectedCrookedCopRole, crookedCopFoundRole: chosenRole});
+  }
 
   render() {
     if (!this.state.gameStarted) {
@@ -320,14 +356,14 @@ class Game extends Component {
           Citizen has no special action.
         </div>
       );
-    } else if (roleInfo && roleInfo.name === 'Detective') {
+    } /*else if (roleInfo && roleInfo.name === 'Detective') {
       roleAction = (
         <div>
           Flash Badge to learn someones role
           <br /><img src="/assets/detective-badge.png" />
         </div>
       );
-    } else if (roleInfo && roleInfo.name === 'Undercover Cop') {
+    }*/ else if (roleInfo && roleInfo.name === 'Undercover Cop') {
       roleAction = (
         <div>
           <ul>
@@ -479,6 +515,56 @@ class Game extends Component {
           Chosen people: {(this.state.selectedPsychicRoles || []).join(', ')}
           <br />
           Leaked role: {this.state.chosenPsychicRole}
+        </div>
+      );
+    } else if (roleInfo && roleInfo.name === 'Detective') {
+      let rolesOtherThanMe = this.state.roleArr.filter(r => {
+        return r.displayName !== this.state.user.displayName;
+      });
+      roleAction = (
+        <div>
+          Use your badge to learn another players role
+          <br />
+          <br />
+          {rolesOtherThanMe.map(p => {
+            let selectedDetectiveRole = this.state.selectedDetectiveRole || '';
+            let selected = selectedDetectiveRole === p.displayName;
+            let selectedStyle = {
+              cursor: 'pointer',
+              marginTop: '4px'
+            };
+            let displayText = p.displayName;
+            if (selected) {
+              selectedStyle.backgroundColor = 'lightgreen';
+              displayText += " : " + this.state.detectiveFoundRole;
+            }
+            return <li style={selectedStyle} onClick={() => this.selectDetectiveRole(p.displayName)}>{displayText}</li>;
+          })}
+        </div>
+      );
+    } else if (roleInfo && roleInfo.name === 'Crooked Cop') {
+      let rolesOtherThanMe = this.state.roleArr.filter(r => {
+        return r.displayName !== this.state.user.displayName;
+      });
+      roleAction = (
+        <div>
+          Use your badge to learn another players role
+          <br />
+          <br />
+          {rolesOtherThanMe.map(p => {
+            let selectedCrookedCopRole = this.state.selectedCrookedCopRole || '';
+            let selected = selectedCrookedCopRole === p.displayName;
+            let selectedStyle = {
+              cursor: 'pointer',
+              marginTop: '4px'
+            };
+            let displayText = p.displayName;
+            if (selected) {
+              selectedStyle.backgroundColor = 'lightgreen';
+              displayText += " : " + this.state.crookedCopFoundRole;
+            }
+            return <li style={selectedStyle} onClick={() => this.selectCrookedCopRole(p.displayName)}>{displayText}</li>;
+          })}
         </div>
       );
     }
