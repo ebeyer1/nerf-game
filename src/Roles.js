@@ -170,6 +170,12 @@ const Roles = [
     team: 'neutral',
     description: 'The Martyr wants to die for their cause and wins the game if killed. The Martyr cannot kill. They are not a part of any team other than their own cause.',
     specialWinCondition: 'If the martyr dies, they win.'
+  },
+  {
+    id: 'zombie',
+    name: 'Zombie',
+    team: 'city',
+    description: 'When the zombie dies, they indicate it on the app. the player may RISE FROM THE DEAD at any point but can no longer use a weapon. when they are killed a second time they are dead for good. If the zombie is the last City member standing, the city loses.'
   }
   // zombie, necro, and hitman
 ];

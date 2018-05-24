@@ -311,7 +311,15 @@ class Game extends Component {
           Mob Capo
         </div>
       );
-    }*/
+    }*/ else if (roleInfo && roleInfo.name === 'Zombie') {
+      roleAction = (
+        <div>
+          You may RISE FROM THE DEAD!
+          <br />
+          You can no longer use your weapon. You can kill someone by touching them.
+        </div>
+      );
+    }
     
     return (
       <Layout className="Home">
