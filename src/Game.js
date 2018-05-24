@@ -319,6 +319,25 @@ class Game extends Component {
           You can no longer use your weapon. You can kill someone by touching them.
         </div>
       );
+    } else if (roleInfo && roleInfo.name === 'Mole') {
+      let mobPlayers = this.state.roleArr.filter(r => {
+        let role = Roles.find(x => x.id === r.role);
+        return role.team === 'mob' && r.displayName !== this.state.user.displayName;
+      });
+      let listStyle = {
+        listStyleType: 'none',
+        marginTop: '8px'
+      };
+      roleAction = (
+        <div>
+          <strong>Knows who other mob members are:</strong>
+          <ol style={listStyle}>
+            {mobPlayers.map(p => {
+              return <li>{p.displayName}</li>;
+            })}
+          </ol>
+        </div>
+      );
     }
     
     return (
