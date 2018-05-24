@@ -17,6 +17,8 @@ class Game extends Component {
     super(props);
     // Set the default state of our application
 
+    this.lastRefreshGameOver = false;
+    
     console.log('game props', props, props.match.params.hash);
     this.state = {
       roomHash: props.match.params.hash,
@@ -47,8 +49,23 @@ class Game extends Component {
           }
         }
 
-        this.setState({ playerId: player.id, playerName: player.displayName, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
-        winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead, roles: room.roles, players: room.players, creatorId: room.creatorId });
+        let newState = { playerId: player.id, playerName: player.displayName, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
+        winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead, roles: room.roles, players: room.players, creatorId: room.creatorId };
+        if (room.gameOver == false && this.lastRefreshGameOver == true) {
+          this.lastRefreshGameOver = false;
+          newState.selectedThiefRoles = [];
+          newState.selectedPsychicRoles = [];
+          newState.selectedDetectiveRole = '';
+          newState.selectedCrookedCopRole = '';
+          newState.chosenThiefRole = '';
+          newState.chosenPsychicRole = '';
+          newState.detectiveFoundRole = '';
+          newState.crookedCopFoundRole = '';
+        } else {
+          this.lastRefreshGameOver = room.gameOver;
+        }
+        
+        this.setState(newState);
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
       }
