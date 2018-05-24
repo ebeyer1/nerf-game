@@ -298,9 +298,13 @@ class Game extends Component {
         winCondition = teamInfo.winCondition;
       }
     }
+    let roleNameStyle = {
+      fontSize: '24px',
+      borderBottom: '1px solid black'
+    };
     let roleInfoDisplay = roleInfo ? (
       <div>
-        <strong>Role</strong>: {roleInfo.name}
+        <span style={roleNameStyle}><strong>Role</strong>: {roleInfo.name}</span>
         <br />
         <strong>Team</strong>: {roleInfo.team}
         <br />
@@ -569,17 +573,23 @@ class Game extends Component {
       );
     }
     
+    let linkToHomeStyle = {
+      position: 'absolute',
+      top: '6px',
+      left: '10px',
+      borderBottom: '1px solid lightblue'
+    };
     return (
       <Layout className="Home">
         <Content className="Home-content">
-          <div>
-            <Link to="/">Back to Home</Link>
+          <div style={linkToHomeStyle}>
+            <Link to="/">Back to Lobby</Link>
           </div>
           <div>
             <h2>Room Code: {this.state.roomHash}</h2>
             <br />
             {gameOverMessage}
-            <h4>Role Info</h4>
+            <br />
             {roleInfoDisplay}
             
             <br />
