@@ -155,15 +155,15 @@ const Roles = [
       'Resist Temptation - Cannot be affected by any abilities.'
     ]
   },
-  {
-    id: 'wizard',
-    name: 'Wizard',
-    team: 'city',
-    description: 'The wizard has the “Spell” Ability. They are on the side of the City.',
-    abilities: [
-      'Spell - Select a player in the app and cast a random spell onto them. They player will be notified of the spell and its effects.'
-    ]
-  },
+  // {
+  //   id: 'wizard',
+  //   name: 'Wizard',
+  //   team: 'city',
+  //   description: 'The wizard has the “Spell” Ability. They are on the side of the City.',
+  //   abilities: [
+  //     'Spell - Select a player in the app and cast a random spell onto them. They player will be notified of the spell and its effects.'
+  //   ]
+  // },
   {
     id: 'martyr',
     name: 'Martyr',
