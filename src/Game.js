@@ -192,7 +192,8 @@ class Game extends Component {
         gameOver: false
       });
 
-    this.setState({resettingGame: false});
+    this.setState({resettingGame: false, selectedThiefRoles: [], selectedPsychicRoles: [], selectedDetectiveRole: '', selectedCrookedCopRole: '',
+                   chosenThiefRole: '', chosenPsychicRole: '', detectiveFoundRole: '', crookedCopFoundRole: ''});
   }
 
   // todo - getRandomInt and pickOne shouldn't be duplicated in Game and Lobby
@@ -429,7 +430,7 @@ class Game extends Component {
       let randomUserIdx = this.getRandomInt(0, rolesOtherThanMe.length);
       let randomUser = rolesOtherThanMe[randomUserIdx];
       var pct = this.getRandomInt(0, 99);
-      let randomRole = '';
+      let randomRole = '[did not work, reload page]';
       if (pct >= 40) {
         let role = Roles.find(r => r.id === randomUser.role);
         randomRole = role.name;
@@ -438,7 +439,7 @@ class Game extends Component {
           return r.displayName !== randomUser.displayName;
         });
         let otherUserIdx = this.getRandomInt(0, otherUsers.length);
-        let otherUser = otherUsers[otherUserIdx];
+        let otherUser = otherUsers[otherUserIdx] || {};
         let otherRole = Roles.find(r => r.id === otherUser.role);
         randomRole = otherRole.name;
         if (randomRole === 'Priest' || randomRole === 'Mob boss') {
