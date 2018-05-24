@@ -27,6 +27,7 @@ class Game extends Component {
     // We want event handlers to share this context
     this.iDied = this.iDied.bind(this);
     this.resetGame = this.resetGame.bind(this);
+    this.selectThiefRole = this.selectThiefRole.bind(this);
 
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
@@ -202,6 +203,24 @@ class Game extends Component {
     var idx = this.getRandomInt(0, roleList.length);
     return roleList.splice(idx, 1)[0];
   }
+  
+  selectThiefRole(user) {
+    var selectedThiefRoles = this.state.selectedThiefRoles || [];
+    if (selectedThiefRoles.length >= 2) {
+      return;
+    }
+    selectedThiefRoles.push(user);
+    let chosenRole = '';
+    if (selectedThiefRoles.length >= 2) {
+      let idx = this.getRandomInt(0, 2);
+      let name = selectedThiefRoles[idx];
+      let role = this.state.roleArr.find(r => r.displayName === name);
+      let actualRole = Roles.find(r => r.id === role.role);
+      chosenRole = actualRole.name;
+    }
+    
+    this.setState({selectedThiefRoles: selectedThiefRoles, chosenThiefRole: chosenRole});
+  }
 
   render() {
     if (!this.state.gameStarted) {
@@ -370,6 +389,37 @@ class Game extends Component {
           <br />
           <br />
           Cannot Kill.
+        </div>
+      );
+    } else if (roleInfo && roleInfo.name === 'Thief') {
+      let rolesOtherThanMe = this.state.roleArr.filter(r => {
+        return r.displayName !== this.state.user.displayName;
+      });
+      let listStyle = {
+        listStyleType: 'none',
+        marginTop: '8px'
+      };
+      roleAction = (
+        <div>
+          Select two people below, and get one of their roles...
+          <ol style={listStyle}>
+            {rolesOtherThanMe.map(p => {
+              let selectedThiefRoles = this.state.selectedThiefRoles || [];
+              let selected = selectedThiefRoles.indexOf(p.displayName) >= 0;
+              let selectedStyle = {
+                cursor: 'pointer',
+                marginTop: '4px'
+              };
+              if (selected) {
+                selectedStyle.backgroundColor = 'lightgreen';
+              }
+              return <li style={selectedStyle} onClick={() => this.selectThiefRole(p.displayName)}>{p.displayName}</li>;
+            })}
+          </ol>
+          <br />
+          Chosen people: {(this.state.selectedThiefRoles || []).join(', ')}
+          <br />
+          Leaked role: {this.state.chosenThiefRole}
         </div>
       );
     }

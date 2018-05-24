@@ -98,10 +98,10 @@ const Roles = [
   {
     id: 'thief',
     name: 'Thief',
-    team: 'city',
-    description: 'The Thief has the “Pickpocket” ability. They start on the side of the City, but if they Pickpocket a member of the “Law” they become a member of the Mob.',
+    team: 'mob',
+    description: 'The Thief has the “Pickpocket” ability. On the mob side.',
     abilities: [
-      'Pickpocket - Select a player in the app to steal some information from. A piece of random information will be sent to the Thief. A Thief can find out if a player has an Ability, a Trait, if they are on the side of the City, or a Mob Member. If the Thief tries to Pickpocket a member of the “Law” they will be on the run. The Thief now becomes a member of the Mob without being informed who other members are. All members of the “Law” are informed who the Thief is.'
+      'Pickpocket - Select two players in the app to steal some information from. You will receive one of their roles, but will not know who\'s'
     ]
   },
   {
