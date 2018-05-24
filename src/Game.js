@@ -114,26 +114,38 @@ class Game extends Component {
       }
       return role;
     });
-
-    let alivePlayers = updatedRoleArr.filter(r => r.dead !== true); // accounts for r.dead being null
-
-    let remainingTeams = alivePlayers.map(p => {
-      var roleId = p.role;
-      var role = Roles.find(r => r.id === roleId);
-      return role.team;
-    });
-    let mobPlayers = remainingTeams.filter(t => t === "mob");
+    
+    let martyrDead = updatedRoleArr.find(r => r.role === 'martyr' && r.dead === true);
     let winningTeam = '';
-    if (mobPlayers.length === remainingTeams.length) {
-      winningTeam = 'mob';
-    } else if (mobPlayers.length > 0) {
-      winningTeam = '';
-    } else {
-      var neutralPlayers = remainingTeams.filter(t => t === "neutral");
-      if (neutralPlayers.length >= 1) {
-        winningTeam = 'Martyr'; // only using martyr bc they are the only neutral at the moment.
+    if (martyrDead) {
+      winningTeam = 'martyr';
+    }
+
+    if (winningTeam === '') {
+      let alivePlayers = updatedRoleArr.filter(r => r.dead !== true); // accounts for r.dead being null
+
+      let remainingTeams = alivePlayers.map(p => {
+        var roleId = p.role;
+        var role = Roles.find(r => r.id === roleId);
+        return role.team;
+      });
+      let mobPlayers = remainingTeams.filter(t => t === "mob");
+      // if all remaining players are mob, then mob wins
+      if (mobPlayers.length === remainingTeams.length) {
+        winningTeam = 'mob';
+      } else if (mobPlayers.length > 0) { // if not all, but some remaining players are mob, game is still going
+        winningTeam = '';
       } else {
-        winningTeam = 'city';
+        var cityPlayers = remainingTeams.filter(t => t === "city");
+        // if all remaining players are city; city wins.
+        if (cityPlayers.length === remainingTeams.length) {
+          winningTeam = 'city';
+        }
+        var neutralPlayers = remainingTeams.filter(t => t === "neutral");
+        // if only martyr is alive... no one wins.
+        if (neutralPlayers.length === remainingTeams.length) {
+          winningTeam = 'No One';
+        }
       }
     }
 
@@ -242,7 +254,8 @@ class Game extends Component {
       </div>
     ) : ( <div></div> );
 
-    let winningTeam = roleInfo && roleInfo.team === this.state.winningTeam;
+    let winningTeam = (roleInfo && roleInfo.team === this.state.winningTeam) ||
+                      (roleInfo && roleInfo.id === this.state.winningTeam);
     let gameWonStyle = {
       backgroundColor: winningTeam ? 'lightgreen' : 'indianred'
     };
