@@ -28,6 +28,7 @@ class Game extends Component {
     this.iDied = this.iDied.bind(this);
     this.resetGame = this.resetGame.bind(this);
     this.selectThiefRole = this.selectThiefRole.bind(this);
+    this.selectPsychicRole = this.selectPsychicRole.bind(this);
 
     firestore.collection("rooms").doc(this.state.roomHash).onSnapshot(snapshot => {
       console.log('heres my snapshot', snapshot);
@@ -220,6 +221,24 @@ class Game extends Component {
     }
     
     this.setState({selectedThiefRoles: selectedThiefRoles, chosenThiefRole: chosenRole});
+  }
+  
+  selectPsychicRole(user) {
+    var selectedPsychicRoles = this.state.selectedPsychicRoles || [];
+    if (selectedPsychicRoles.length >= 2) {
+      return;
+    }
+    selectedPsychicRoles.push(user);
+    let chosenRole = '';
+    if (selectedPsychicRoles.length >= 2) {
+      let idx = this.getRandomInt(0, 2);
+      let name = selectedPsychicRoles[idx];
+      let role = this.state.roleArr.find(r => r.displayName === name);
+      let actualRole = Roles.find(r => r.id === role.role);
+      chosenRole = actualRole.name;
+    }
+    
+    this.setState({selectedPsychicRoles: selectedPsychicRoles, chosenPsychicRole: chosenRole});
   }
 
   render() {
@@ -420,6 +439,37 @@ class Game extends Component {
           Chosen people: {(this.state.selectedThiefRoles || []).join(', ')}
           <br />
           Leaked role: {this.state.chosenThiefRole}
+        </div>
+      );
+    } else if (roleInfo && roleInfo.name === 'Psychic') {
+      let rolesOtherThanMe = this.state.roleArr.filter(r => {
+        return r.displayName !== this.state.user.displayName;
+      });
+      let listStyle = {
+        listStyleType: 'none',
+        marginTop: '8px'
+      };
+      roleAction = (
+        <div>
+          Select two people below, and get one of their roles...
+          <ol style={listStyle}>
+            {rolesOtherThanMe.map(p => {
+              let selectedPsychicRoles = this.state.selectedPsychicRoles || [];
+              let selected = selectedPsychicRoles.indexOf(p.displayName) >= 0;
+              let selectedStyle = {
+                cursor: 'pointer',
+                marginTop: '4px'
+              };
+              if (selected) {
+                selectedStyle.backgroundColor = 'lightgreen';
+              }
+              return <li style={selectedStyle} onClick={() => this.selectPsychicRole(p.displayName)}>{p.displayName}</li>;
+            })}
+          </ol>
+          <br />
+          Chosen people: {(this.state.selectedPsychicRoles || []).join(', ')}
+          <br />
+          Leaked role: {this.state.chosenPsychicRole}
         </div>
       );
     }
