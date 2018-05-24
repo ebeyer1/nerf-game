@@ -218,6 +218,9 @@ class Game extends Component {
       let role = this.state.roleArr.find(r => r.displayName === name);
       let actualRole = Roles.find(r => r.id === role.role);
       chosenRole = actualRole.name;
+      if (chosenRole === 'Priest' || chosenRole === 'Mob boss') {
+        chosenRole = 'unsuccessful';
+      }
     }
     
     this.setState({selectedThiefRoles: selectedThiefRoles, chosenThiefRole: chosenRole});
@@ -236,6 +239,9 @@ class Game extends Component {
       let role = this.state.roleArr.find(r => r.displayName === name);
       let actualRole = Roles.find(r => r.id === role.role);
       chosenRole = actualRole.name;
+      if (chosenRole === 'Priest' || chosenRole === 'Mob boss') {
+        chosenRole = 'unsuccessful';
+      }
     }
     
     this.setState({selectedPsychicRoles: selectedPsychicRoles, chosenPsychicRole: chosenRole});
@@ -395,6 +401,9 @@ class Game extends Component {
         let otherUser = otherUsers[otherUserIdx];
         let otherRole = Roles.find(r => r.id === otherUser.role);
         randomRole = otherRole.name;
+        if (randomRole === 'Priest' || randomRole === 'Mob boss') {
+          randomRole = 'unsuccessful';
+        }
       }
       roleAction = (
         <div>
