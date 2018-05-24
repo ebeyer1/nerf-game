@@ -338,6 +338,40 @@ class Game extends Component {
           </ol>
         </div>
       );
+    } else if (roleInfo && roleInfo.name === 'Informant') {
+      let rolesOtherThanMe = this.state.roleArr.filter(r => {
+        return r.displayName !== this.state.user.displayName;
+      });
+      let randomUserIdx = this.getRandomInt(0, rolesOtherThanMe.length);
+      let randomUser = rolesOtherThanMe[randomUserIdx];
+      var pct = this.getRandomInt(0, 99);
+      let randomRole = '';
+      if (pct >= 40) {
+        let role = Roles.find(r => r.id === randomUser.role);
+        randomRole = role.name;
+      } else {
+        let otherUsers = rolesOtherThanMe.filter(r => {
+          return r.displayName !== randomUser.displayName;
+        });
+        let otherUserIdx = this.getRandomInt(0, otherUsers.length);
+        let otherUser = otherUsers[otherUserIdx];
+        let otherRole = Roles.find(r => r.id === otherUser.role);
+        randomRole = otherRole.name;
+      }
+      roleAction = (
+        <div>
+          Word on the street is <strong>{randomUser.displayName}</strong> is a <strong>{randomRole}</strong>...
+        </div>
+      );
+    } else if (roleInfo && roleInfo.name === 'Martyr') {
+      roleAction = (
+        <div>
+          Win if you die.
+          <br />
+          <br />
+          Cannot Kill.
+        </div>
+      );
     }
     
     return (
