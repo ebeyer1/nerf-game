@@ -431,19 +431,23 @@ class Game extends Component {
       let randomUser = rolesOtherThanMe[randomUserIdx];
       var pct = this.getRandomInt(0, 99);
       let randomRole = '[did not work, reload page]';
-      if (pct >= 40) {
+      if (pct >= 40 || rolesOtherThanMe.length === 1) {
         let role = Roles.find(r => r.id === randomUser.role);
-        randomRole = role.name;
+        randomRole = role.name || randomRole;
       } else {
         let otherUsers = rolesOtherThanMe.filter(r => {
           return r.displayName !== randomUser.displayName;
         });
         let otherUserIdx = this.getRandomInt(0, otherUsers.length);
-        let otherUser = otherUsers[otherUserIdx] || {};
-        let otherRole = Roles.find(r => r.id === otherUser.role);
-        randomRole = otherRole.name;
-        if (randomRole === 'Priest' || randomRole === 'Mob boss') {
-          randomRole = 'unsuccessful';
+        let otherUser = otherUsers[otherUserIdx];
+        if (otherUser) {
+          let otherRole = Roles.find(r => r.id === otherUser.role);
+          if (otherRole) {
+            randomRole = otherRole.name;
+            if (randomRole === 'Priest' || randomRole === 'Mob boss') {
+              randomRole = 'unsuccessful';
+            }
+          }
         }
       }
       roleAction = (
