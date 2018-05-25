@@ -434,8 +434,8 @@ class Game extends Component {
         <div>
           <strong>Knows who other mob members are:</strong>
           <ol style={listStyle}>
-            {mobPlayers.map(p => {
-              return <li>{p.displayName}</li>;
+            {mobPlayers.map((p, i) => {
+              return <li key={i}>{p.displayName}</li>;
             })}
           </ol>
         </div>
@@ -448,24 +448,17 @@ class Game extends Component {
       let randomUser = rolesOtherThanMe[randomUserIdx];
       var pct = this.getRandomInt(0, 99);
       let randomRole = '[did not work, reload page]';
-      if (pct >= 40 || rolesOtherThanMe.length === 1) {
+      if (pct >= 40) {
         let role = Roles.find(r => r.id === randomUser.role);
         randomRole = role.name || randomRole;
       } else {
-        let otherUsers = rolesOtherThanMe.filter(r => {
-          return r.displayName !== randomUser.displayName;
-        });
-        let otherUserIdx = this.getRandomInt(0, otherUsers.length);
-        let otherUser = otherUsers[otherUserIdx];
-        if (otherUser) {
-          let otherRole = Roles.find(r => r.id === otherUser.role);
-          if (otherRole) {
-            randomRole = otherRole.name;
-            if (randomRole === 'Priest' || randomRole === 'Mob boss') {
-              randomRole = 'unsuccessful';
-            }
-          }
-        }
+        let roleOptions = this.state.roles.filter(r => r !== randomUser.role && r !== this.state.playerRole);
+        let newRandomIdx = this.getRandomInt(0, roleOptions.length);
+        let newRandomRole = Roles.find(r => r.id === roleOptions[newRandomIdx]);
+        randomRole = newRandomRole.name || randomRole;
+      }
+      if (randomRole === 'Priest' || randomRole === 'Mob boss') {
+        randomRole = 'unsuccessful';
       }
       roleAction = (
         <div>
@@ -493,7 +486,7 @@ class Game extends Component {
         <div>
           Select two people below, and get one of their roles...
           <ol style={listStyle}>
-            {rolesOtherThanMe.map(p => {
+            {rolesOtherThanMe.map((p, i) => {
               let selectedThiefRoles = this.state.selectedThiefRoles || [];
               let selected = selectedThiefRoles.indexOf(p.displayName) >= 0;
               let selectedStyle = {
@@ -503,7 +496,7 @@ class Game extends Component {
               if (selected) {
                 selectedStyle.backgroundColor = 'lightgreen';
               }
-              return <li style={selectedStyle} onClick={() => this.selectThiefRole(p.displayName)}>{p.displayName}</li>;
+              return <li key={i} style={selectedStyle} onClick={() => this.selectThiefRole(p.displayName)}>{p.displayName}</li>;
             })}
           </ol>
           <br />
@@ -524,7 +517,7 @@ class Game extends Component {
         <div>
           Select two people below, and get one of their roles...
           <ol style={listStyle}>
-            {rolesOtherThanMe.map(p => {
+            {rolesOtherThanMe.map((p, i) => {
               let selectedPsychicRoles = this.state.selectedPsychicRoles || [];
               let selected = selectedPsychicRoles.indexOf(p.displayName) >= 0;
               let selectedStyle = {
@@ -534,7 +527,7 @@ class Game extends Component {
               if (selected) {
                 selectedStyle.backgroundColor = 'lightgreen';
               }
-              return <li style={selectedStyle} onClick={() => this.selectPsychicRole(p.displayName)}>{p.displayName}</li>;
+              return <li key={i} style={selectedStyle} onClick={() => this.selectPsychicRole(p.displayName)}>{p.displayName}</li>;
             })}
           </ol>
           <br />
@@ -552,7 +545,7 @@ class Game extends Component {
           Use your badge to learn another players role
           <br />
           <br />
-          {rolesOtherThanMe.map(p => {
+          {rolesOtherThanMe.map((p, i) => {
             let selectedDetectiveRole = this.state.selectedDetectiveRole || '';
             let selected = selectedDetectiveRole === p.displayName;
             let selectedStyle = {
@@ -564,7 +557,7 @@ class Game extends Component {
               selectedStyle.backgroundColor = 'lightgreen';
               displayText += " : " + this.state.detectiveFoundRole;
             }
-            return <li style={selectedStyle} onClick={() => this.selectDetectiveRole(p.displayName)}>{displayText}</li>;
+            return <li key={i} style={selectedStyle} onClick={() => this.selectDetectiveRole(p.displayName)}>{displayText}</li>;
           })}
         </div>
       );
@@ -577,7 +570,7 @@ class Game extends Component {
           Use your badge to learn another players role
           <br />
           <br />
-          {rolesOtherThanMe.map(p => {
+          {rolesOtherThanMe.map((p, i) => {
             let selectedCrookedCopRole = this.state.selectedCrookedCopRole || '';
             let selected = selectedCrookedCopRole === p.displayName;
             let selectedStyle = {
@@ -589,7 +582,7 @@ class Game extends Component {
               selectedStyle.backgroundColor = 'lightgreen';
               displayText += " : " + this.state.crookedCopFoundRole;
             }
-            return <li style={selectedStyle} onClick={() => this.selectCrookedCopRole(p.displayName)}>{displayText}</li>;
+            return <li key={i} style={selectedStyle} onClick={() => this.selectCrookedCopRole(p.displayName)}>{displayText}</li>;
           })}
         </div>
       );

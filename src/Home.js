@@ -267,7 +267,7 @@ class Home extends Component {
             )}
           />
         </Content>
-        <Footer className="Home-footer">&copy; My Company</Footer>
+        <Footer className="Home-footer">&copy; Corn Bean Inc</Footer>
       </Layout>
     );
   }
