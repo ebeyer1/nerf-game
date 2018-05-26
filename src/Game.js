@@ -58,7 +58,7 @@ class Game extends Component {
           if (window.navigator && window.navigator.vibrate) {
             var now = new Date();
             var diff = now - this.pageLoadedAt;
-            if (diff >= 15000) {
+            if (diff >= 5000) {
               console.log('VIBRATING!!!', diff);
               window.navigator.vibrate([200, 100, 200]);
             }
