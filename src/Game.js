@@ -18,6 +18,8 @@ class Game extends Component {
     // Set the default state of our application
 
     this.lastRefreshGameOver = false;
+    this.gameOver = false;
+    this.pageLoadedAt = new Date();
     
     console.log('game props', props, props.match.params.hash);
     this.state = {
@@ -51,6 +53,19 @@ class Game extends Component {
 
         let newState = { playerId: player.id, playerName: player.displayName, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
         winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead, roles: room.roles, players: room.players, creatorId: room.creatorId };
+        
+        if (this.gameOver === false && room.gameOver === true) {
+          if (window.navigator && window.navigator.vibrate) {
+            var now = new Date();
+            var diff = now - this.pageLoadedAt;
+            if (diff >= 15000) {
+              console.log('VIBRATING!!!', diff);
+              window.navigator.vibrate([200, 100, 200]);
+            }
+          }
+        }
+        this.gameOver = room.gameOver;
+        
         if (room.gameOver == false && this.lastRefreshGameOver == true) {
           this.lastRefreshGameOver = false;
           newState.selectedThiefRoles = [];
