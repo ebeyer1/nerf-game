@@ -78,6 +78,15 @@ class Game extends Component {
           newState.crookedCopFoundRole = '';
         } else {
           this.lastRefreshGameOver = room.gameOver;
+          // preserve existing state for these properties
+          newState.selectedThiefRoles = this.state.selectedThiefRoles;
+          newState.selectedPsychicRoles = this.state.selectedPsychicRoles;
+          newState.selectedDetectiveRole = this.state.selectedDetectiveRole;
+          newState.selectedCrookedCopRole = this.state.selectedCrookedCopRole;
+          newState.chosenThiefRole = this.state.chosenThiefRole;
+          newState.chosenPsychicRole = this.state.chosenPsychicRole;
+          newState.detectiveFoundRole = this.state.detectiveFoundRole;
+          newState.crookedCopFoundRole = this.state.crookedCopFoundRole;
         }
 
         this.setState(newState);
