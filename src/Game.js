@@ -20,7 +20,7 @@ class Game extends Component {
     this.lastRefreshGameOver = false;
     this.gameOver = false;
     this.pageLoadedAt = new Date();
-    
+
     console.log('game props', props, props.match.params.hash);
     this.state = {
       roomHash: props.match.params.hash,
@@ -53,7 +53,7 @@ class Game extends Component {
 
         let newState = { playerId: player.id, playerName: player.displayName, playerRole: player.role, gameStarted: room.gameStarted, roleArr: room.roleArr,
         winningTeam: room.winningTeam, gameOver: room.gameOver, iAmDead: player.dead, roles: room.roles, players: room.players, creatorId: room.creatorId };
-        
+
         if (this.gameOver === false && room.gameOver === true) {
           if (window.navigator && window.navigator.vibrate) {
             var now = new Date();
@@ -65,7 +65,7 @@ class Game extends Component {
           }
         }
         this.gameOver = room.gameOver;
-        
+
         if (room.gameOver == false && this.lastRefreshGameOver == true) {
           this.lastRefreshGameOver = false;
           newState.selectedThiefRoles = [];
@@ -79,7 +79,7 @@ class Game extends Component {
         } else {
           this.lastRefreshGameOver = room.gameOver;
         }
-        
+
         this.setState(newState);
       } else {
         // Send user to a page saying this does not exist... or just show a message saying it DNE
@@ -150,12 +150,8 @@ class Game extends Component {
       }
       return role;
     });
-    
-    let martyrDead = updatedRoleArr.find(r => r.role === 'martyr' && r.dead === true);
+
     let winningTeam = '';
-    if (martyrDead) {
-      winningTeam = 'martyr';
-    }
 
     if (winningTeam === '') {
       let alivePlayers = updatedRoleArr.filter(r => r.dead !== true); // accounts for r.dead being null
@@ -176,16 +172,25 @@ class Game extends Component {
         // if all remaining players are city; city wins.
         if (cityPlayers.length === remainingTeams.length) {
           winningTeam = 'city';
-        }
-        var neutralPlayers = remainingTeams.filter(t => t === "neutral");
-        // if only martyr is alive... no one wins.
-        if (neutralPlayers.length === remainingTeams.length) {
-          winningTeam = 'No One';
+        } else {
+          var neutralPlayers = remainingTeams.filter(t => t === "neutral");
+          // if only martyr is alive... no one wins.
+          if (neutralPlayers.length === remainingTeams.length) {
+            winningTeam = 'No One';
+          }
         }
       }
     }
 
     let gameOver = winningTeam !== '';
+    if (gameOver) {
+      let martyrDead = updatedRoleArr.find(r => r.role === 'martyr' && r.dead === true);
+      // if martyr is dead, and the game is over, then the martyr actually wins!
+      if (martyrDead) {
+        winningTeam = 'martyr';
+      }
+    }
+
     await roomRef
       .update({
         roleArr: updatedRoleArr,
@@ -239,7 +244,7 @@ class Game extends Component {
     var idx = this.getRandomInt(0, roleList.length);
     return roleList.splice(idx, 1)[0];
   }
-  
+
   selectThiefRole(user) {
     var selectedThiefRoles = this.state.selectedThiefRoles || [];
     if (selectedThiefRoles.length >= 2) {
@@ -257,10 +262,10 @@ class Game extends Component {
         chosenRole = 'unsuccessful';
       }
     }
-    
+
     this.setState({selectedThiefRoles: selectedThiefRoles, chosenThiefRole: chosenRole});
   }
-  
+
   selectPsychicRole(user) {
     var selectedPsychicRoles = this.state.selectedPsychicRoles || [];
     if (selectedPsychicRoles.length >= 2) {
@@ -278,10 +283,10 @@ class Game extends Component {
         chosenRole = 'unsuccessful';
       }
     }
-    
+
     this.setState({selectedPsychicRoles: selectedPsychicRoles, chosenPsychicRole: chosenRole});
   }
-  
+
   selectDetectiveRole(user) {
     var selectedDetectiveRole = this.state.selectedDetectiveRole || '';
     if (selectedDetectiveRole) {
@@ -290,15 +295,15 @@ class Game extends Component {
     selectedDetectiveRole = user;
     let role = this.state.roleArr.find(r => r.displayName === user);
     let actualRole = Roles.find(r => r.id === role.role);
-    
+
     let chosenRole = actualRole.name;
     if (chosenRole === 'Priest' || chosenRole === 'Mob boss') {
       chosenRole = 'unsuccessful';
     }
-    
+
     this.setState({selectedDetectiveRole: selectedDetectiveRole, detectiveFoundRole: chosenRole});
   }
-  
+
   selectCrookedCopRole(user) {
     var selectedCrookedCopRole = this.state.selectedCrookedCopRole || '';
     if (selectedCrookedCopRole) {
@@ -307,12 +312,12 @@ class Game extends Component {
     selectedCrookedCopRole = user;
     let role = this.state.roleArr.find(r => r.displayName === user);
     let actualRole = Roles.find(r => r.id === role.role);
-    
+
     let chosenRole = actualRole.name;
     if (chosenRole === 'Priest' || chosenRole === 'Mob boss') {
       chosenRole = 'unsuccessful';
     }
-    
+
     this.setState({selectedCrookedCopRole: selectedCrookedCopRole, crookedCopFoundRole: chosenRole});
   }
 
@@ -376,7 +381,7 @@ class Game extends Component {
     let gameWonStyle = {
       backgroundColor: winningTeam ? 'lightgreen' : 'indianred'
     };
-    
+
     let gameOverMessage = this.state.gameOver ? (
       <div>
         <h1 style={gameWonStyle}>Game Over: {this.state.winningTeam} Wins!</h1>
@@ -602,7 +607,7 @@ class Game extends Component {
         </div>
       );
     }
-    
+
     let linkToHomeStyle = {
       position: 'absolute',
       top: '6px',
@@ -621,7 +626,7 @@ class Game extends Component {
             {gameOverMessage}
             <br />
             {roleInfoDisplay}
-            
+
             <br />
             <Button
               className="Lobby-i-died-button"
@@ -634,7 +639,7 @@ class Game extends Component {
               {deadButtonText}
             </Button>
             <br />
-            
+
             <div className="role-action-container">
               {roleAction}
             </div>
