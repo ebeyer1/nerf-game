@@ -93,7 +93,7 @@ class Home extends Component {
     let data = room.data();
     console.log('data ', data);
     let playerCount = data.playersInLobby || 1;
-    
+
     let playerList = data.players || [];
     if (!playerList.find(p => p.id === this.state.user.uid)) {
       if (playerCount >= data.maxPlayers) {
@@ -101,7 +101,7 @@ class Home extends Component {
         this.setState({ joiningRoom: false });
         return;
       }
-      
+
       playerList.push({id: this.state.user.uid, displayName: this.state.user.displayName});
       await roomRef
         .update({
@@ -161,48 +161,56 @@ class Home extends Component {
       float: 'left',
       color: 'whitesmoke'
     };
-    
+
     const accountLinkStyle = {
       fontSize: '14px',
     };
-    
+
     const editNameContainerStyle = {
       lineHeight: '28px'
     };
-    
+
     const greeting = isLoggedIn ? (
       <div style={greetingStyle}>
         <span>Hello, {(this.state.user || {}).displayName || 'Guest User'}</span>
         <div style={editNameContainerStyle}>
-          <Link to="/account" style={accountLinkStyle}>(Edit name)</Link>
+          <Button
+            className="Home-create-room-button"
+            size="small"
+            type="default"
+            href="/account"
+            disabled={!isLoggedIn}
+          >
+            (Edit name)
+          </Button>
         </div>
       </div>
     ) : (
       <div style={greetingStyle}>Please sign in</div>
     );
-    
+
     const loggedInButtonStyle = {
       float: 'right'
     }
-    
+
     const buttonText = isLoggedIn ? (
       <span>Sign Out</span>
     ) : (
       <span>Sign In</span>
     );
-      
+
     let hasDisplayName = isLoggedIn ?
       this.state.user && this.state.user.displayName && this.state.user.displayName.length > 0 :
       false;
-      
+
     const createMessage = isLoggedIn ?
       (hasDisplayName ? (<span></span>) : (<span>Please set a display name</span>)) :
       (<span>Please sign in</span>);
-      
+
     const idStyle = {
       fontSize: '18px'
     };
-    
+
     const createRoomButtonStyle = {
       marginButton: '12px'
     };
